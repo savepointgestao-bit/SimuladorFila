@@ -408,8 +408,8 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
         <div class="inner">
           <p>Pense numa caixa d'água. A fila é a caixa: entra água por uma torneira e sai por um ralo.</p>
           <ul>
-            <li><strong>Entram:</strong> as pessoas adicionadas à fila no mês. Exemplo: 16 por mês.</li>
-            <li><strong>Saem:</strong> cada paciente que termina o acompanhamento libera uma vaga, e o próximo da lista é chamado. Atendimentos por mês = atendimentos por semana × 4,33. Chamados por mês = atendimentos por mês ÷ sessões por paciente. Exemplo: 24 × 4,33 ≈ 104 atendimentos; com 20 sessões são 5 chamados.</li>
+            <li><strong>Entram:</strong> as pessoas adicionadas à fila no mês. Exemplo: 30 por mês.</li>
+            <li><strong>Saem:</strong> cada paciente que termina o acompanhamento libera uma vaga, e o próximo da lista é chamado. Atendimentos por mês = atendimentos por semana × 4,33. Chamados por mês = atendimentos por mês ÷ sessões por paciente. Exemplo: 70 × 4,33 ≈ 303 atendimentos; com 20 sessões são 15 chamados.</li>
             <li><strong>Saldo:</strong> entram menos chamados. Se for positivo, a fila cresce. Se for negativo, diminui.</li>
             <li><strong>Espera de quem entra hoje:</strong> fila atual ÷ chamados por mês.</li>
             <li><strong>Grupos:</strong> um grupo semanal usa 2 atendimentos por semana e atende todas as pessoas juntas. Um grupo de 8 pessoas com 8 encontros conclui 8 pessoas a cada 8 semanas.</li>
@@ -722,7 +722,7 @@ function setAll(v) {
 }
 const RESET = { grupos: 0, pgrupo: 8, mgrupo: 8 };
 function useExample() {
-  setAll(Object.assign({}, RESET, { fila: 477, horarios: 24, entradas: 16, sessoes: 20 }));
+  setAll(Object.assign({}, RESET, { fila: 477, horarios: 70, entradas: 30, sessoes: 20 }));
   update();
 }
 $('btn-exemplo').addEventListener('click', useExample);
