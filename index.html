@@ -91,10 +91,11 @@ h3 { font-size: 15px; margin: 0 0 6px; }
 
 .note { margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: var(--sage); border-left: 4px solid var(--teal); font-size: 14.5px; font-weight: 700; }
 
-.entering { margin-top: 24px; padding-top: 18px; border-top: 1.5px dashed var(--line); }
-.entering h3 { color: var(--ink2); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
 .chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.chip { background: var(--paper); border-radius: 14px; padding: 10px 10px 9px; }
+.dados { margin-top: 18px; }
+.dados-t { margin: 0 0 8px; font-size: 13px; font-weight: 700; color: var(--ink2); text-transform: uppercase; letter-spacing: 0.06em; }
+.chip { font: inherit; text-align: left; cursor: pointer; background: var(--paper); border: 1.5px solid var(--line); border-radius: 14px; padding: 10px 10px 9px; color: var(--ink); }
+.chip:hover { border-color: var(--teal); background: #fff; }
 .chip b { display: block; font-family: var(--serif); font-size: 26px; line-height: 1; font-weight: 600; font-variant-numeric: tabular-nums; }
 .chip span { display: block; margin-top: 4px; font-size: 12.5px; color: var(--ink2); line-height: 1.25; }
 
@@ -169,6 +170,40 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
 .more-card p { margin: 0 0 10px; }
 .more-card ul { margin: 0 0 12px; padding-left: 20px; }
 .more-card li { margin-bottom: 7px; }
+
+/* popup de perguntas */
+.mbtn { font: inherit; font-weight: 700; font-size: 16px; cursor: pointer; border: 0; border-radius: 999px; min-height: 52px; padding: 0 24px; }
+.mbtn.go { background: var(--teal-d); color: #fff; }
+.mbtn.go:hover { background: #155a50; }
+.mbtn[disabled] { opacity: 0.35; cursor: not-allowed; }
+.mbtn.quiet { background: transparent; color: var(--ink2); min-height: 44px; }
+.mbtn.quiet:hover { color: var(--ink); }
+.empty .mbtn { margin: 14px 0 6px; }
+.overlay { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(20, 49, 58, 0.55); -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); }
+.sheet { background: var(--card); border-radius: 26px; width: min(440px, 100%); padding: 22px 24px 20px; box-shadow: 0 28px 70px rgba(10, 30, 36, 0.45); max-height: calc(100% - 24px); overflow: auto; }
+.m-head { display: flex; align-items: center; justify-content: space-between; min-height: 34px; margin-bottom: 18px; }
+.m-count { font-size: 13px; font-weight: 700; color: var(--ink2); letter-spacing: 0.04em; text-transform: uppercase; }
+.dots { display: flex; gap: 6px; align-items: center; margin-top: 8px; }
+.dots i { width: 28px; height: 5px; border-radius: 3px; background: var(--line); }
+.dots i.on { background: var(--teal); }
+.x { font: inherit; font-size: 24px; line-height: 1; width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--sage); color: var(--ink2); cursor: pointer; flex: none; }
+.x:hover { color: var(--ink); }
+.sheet h2 { font-size: 27px; line-height: 1.15; margin: 0 0 8px; }
+.m-hint { margin: 0; font-size: 14.5px; color: var(--ink2); }
+.m-input { display: flex; justify-content: center; margin: 26px 0 10px; }
+.big { display: flex; align-items: center; gap: 10px; }
+.big button { font: inherit; font-size: 28px; line-height: 1; width: 56px; height: 56px; flex: none; border-radius: 50%; border: 0; background: var(--sage); color: var(--teal-d); cursor: pointer; }
+.big button:hover { background: var(--teal-d); color: #fff; }
+.big input { font-family: var(--serif); font-weight: 600; font-size: 60px; text-align: center; width: 150px; border: 0; border-bottom: 3px solid var(--line); border-radius: 0; background: transparent; color: var(--ink); -moz-appearance: textfield; font-variant-numeric: tabular-nums; padding: 0 0 2px; }
+.big input:focus { outline: none; border-bottom-color: var(--teal); }
+.big input::-webkit-outer-spin-button, .big input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.big input::placeholder { color: var(--line); }
+.m-actions { display: flex; flex-direction: column; gap: 4px; margin-top: 16px; }
+@media (max-width: 560px) { .overlay { align-items: flex-start; padding-top: 7vh; } .big input { font-size: 54px; width: 130px; } }
+@media (prefers-reduced-motion: no-preference) {
+  .sheet { animation: rise 0.22s ease-out; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+}
 
 /* barra de resultado no celular */
 .livebar { display: none; }
@@ -264,11 +299,6 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
         </div>
         <p class="hint">Conte na planilha da fila quantos nomes foram incluídos em um mês comum, sem férias ou feriados longos, para fazer a estimativa.</p>
       </div>
-
-      <div class="entering" id="entering" hidden>
-        <h3>O que a conta entendeu</h3>
-        <div class="chips" id="chips"></div>
-      </div>
     </section>
 
     <div class="col">
@@ -297,6 +327,8 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
             <path d="M152 74 l10 8 -10 8" fill="none" stroke="#E2825A" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <strong>Preencha os números da sua UBS para ver o resultado.</strong>
+          São 3 perguntas rápidas, uma de cada vez.
+          <div><button type="button" class="mbtn go" id="btn-perguntas">Responder às 3 perguntas</button></div>
           Ou toque em “Preencher com exemplo” no alto da página.
         </div>
 
@@ -310,6 +342,10 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
           </div>
           <p class="key" id="chave"></p>
           <div class="tiles" id="tiles"></div>
+          <div class="dados">
+            <p class="dados-t">Seus dados. Toque para alterar.</p>
+            <div class="chips" id="chips"></div>
+          </div>
         </div>
 
         <details class="opt" id="mais">
@@ -396,6 +432,23 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
     </div>
   </div>
 </main>
+
+<div class="overlay" id="modal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="m-q">
+    <div class="m-head">
+      <div><span class="m-count" id="m-count"></span><div class="dots" id="m-dots" aria-hidden="true"></div></div>
+      <button type="button" class="x" id="m-close" aria-label="Fechar">×</button>
+    </div>
+    <h2 id="m-q"></h2>
+    <p class="m-hint" id="m-hint"></p>
+    <div class="m-input" id="m-body"></div>
+    <div class="m-actions">
+      <button type="button" class="mbtn go" id="m-next">Continuar</button>
+      <button type="button" class="mbtn quiet" id="m-back">Voltar</button>
+      <button type="button" class="mbtn quiet" id="m-example">Preencher com exemplo</button>
+    </div>
+  </div>
+</div>
 
 <div class="livebar" id="livebar" hidden>
   <span class="lic" id="live-ic" aria-hidden="true"></span>
@@ -484,7 +537,6 @@ function update() {
   $('card-grafico').hidden = !ready;
   $('card-tabela').hidden = !ready;
   $('det-numeros').hidden = !ready;
-  $('entering').hidden = !ready;
 
   const aviso = $('aviso-grupos');
   if (p.G * 2 > p.H && p.H > 0) {
@@ -497,10 +549,10 @@ function update() {
   const r = calc(p);
   const end = r.q[r.q.length - 1];
   $('chips').innerHTML = [
-    [fmt(p.H), 'atendimentos por semana'],
-    [nf1.format(p.E), 'entram na fila por mês'],
-    [fmt(r.out), 'chamados da fila por mês']
-  ].map((c) => '<div class="chip"><b>' + c[0] + '</b><span>' + c[1] + '</span></div>').join('');
+    [fmt(p.F), 'pessoas na fila hoje'],
+    [fmt(p.H), 'atendimentos da UBS por semana'],
+    [fmt(p.E), 'entram na fila por mês']
+  ].map((c, i) => '<button type="button" class="chip" data-i="' + i + '" aria-label="Alterar: ' + c[1] + ', ' + c[0] + '"><b>' + c[0] + '</b><span>' + c[1] + '</span></button>').join('');
 
   // faixa de resultado
   $('banner').className = 'verdict ' + r.state;
@@ -669,13 +721,116 @@ function setAll(v) {
   Object.keys(v).forEach((k) => { $(k).value = v[k]; });
 }
 const RESET = { grupos: 0, pgrupo: 8, mgrupo: 8 };
-$('btn-exemplo').addEventListener('click', () => {
+function useExample() {
   setAll(Object.assign({}, RESET, { fila: 477, horarios: 24, entradas: 16, sessoes: 20 }));
   update();
-});
-$('btn-limpar').addEventListener('click', () => {
+}
+$('btn-exemplo').addEventListener('click', useExample);
+$('btn-limpar').addEventListener('click', (e) => {
   setAll(Object.assign({}, RESET, { fila: 0, horarios: 0, entradas: 0, sessoes: 20 }));
   update();
+  openWizard(e.currentTarget);
+});
+
+// ---------- popup de perguntas ----------
+const STEPS = [
+  { id: 'fila', q: 'Quantas pessoas estão na fila de espera hoje?', min: 0, max: 100000, step: 10,
+    hint: 'Conte na planilha da fila os nomes que ainda aguardam.' },
+  { id: 'horarios', q: 'Qual é o total de atendimentos da UBS por semana?', min: 1, max: 1000, step: 1,
+    hint: 'Conte os atendimentos da agenda em que cabe um paciente. Dois pacientes quinzenais que dividem uma vaga contam como um atendimento só. Se houver mais de um profissional, some os atendimentos de todos.' },
+  { id: 'entradas', q: 'Quantas pessoas entram na fila de espera por mês?', min: 0, max: 10000, step: 1,
+    hint: 'Conte na planilha da fila quantos nomes foram incluídos em um mês comum, sem férias ou feriados longos, para fazer a estimativa.' }
+];
+const W = {};
+let cur = 0, opener = null, editing = false, backup = null;
+const wvalid = (s) => W[s.id] != null && W[s.id] >= s.min && W[s.id] <= s.max;
+const SHELL = ['.top', 'main', '#livebar'];
+const setInert = (on) => SHELL.forEach((q) => { const el = document.querySelector(q); if (el) el.inert = on; });
+
+function openWizard(btn, only) {
+  opener = btn || document.activeElement;
+  editing = only != null;
+  backup = editing ? { fila: $('fila').value, horarios: $('horarios').value, entradas: $('entradas').value } : null;
+  STEPS.forEach((s) => { const v = num(s.id, 0, s.max); W[s.id] = v > 0 ? v : null; });
+  cur = editing ? only : 0;
+  $('modal').hidden = false;
+  setInert(true);
+  renderStep();
+}
+function closeWizard(revert) {
+  if (revert && backup) Object.keys(backup).forEach((k) => { $(k).value = backup[k]; });
+  $('modal').hidden = true;
+  setInert(false);
+  update();
+  if (opener && opener.focus) { try { opener.focus({ preventScroll: true }); } catch (e) {} }
+}
+function goResult() {
+  if (!ready) return;
+  const calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $('h-passo2').scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
+}
+function bigEl(s) {
+  const wrap = document.createElement('div');
+  wrap.className = 'big';
+  const minus = document.createElement('button'); minus.type = 'button'; minus.textContent = '−'; minus.setAttribute('aria-label', 'Diminuir');
+  const plus = document.createElement('button'); plus.type = 'button'; plus.textContent = '+'; plus.setAttribute('aria-label', 'Aumentar');
+  const input = document.createElement('input');
+  input.type = 'number'; input.inputMode = 'numeric'; input.min = s.min; input.max = s.max; input.placeholder = '0';
+  input.id = 'w-' + s.id; input.setAttribute('aria-label', s.q);
+  input.value = W[s.id] == null ? '' : W[s.id];
+  const set = (v) => { W[s.id] = v; input.value = v == null ? '' : v; commit(s); };
+  minus.addEventListener('click', () => set(W[s.id] == null ? s.min : Math.max(s.min, W[s.id] - s.step)));
+  plus.addEventListener('click', () => set(W[s.id] == null ? Math.max(s.min, s.step) : Math.min(s.max, W[s.id] + s.step)));
+  input.addEventListener('input', () => {
+    const v = parseInt(input.value, 10);
+    W[s.id] = isNaN(v) ? null : Math.min(s.max, Math.max(s.min, v));
+    commit(s);
+  });
+  input.addEventListener('blur', () => { input.value = W[s.id] == null ? '' : W[s.id]; });
+  wrap.appendChild(minus); wrap.appendChild(input); wrap.appendChild(plus);
+  return wrap;
+}
+function commit(s) {
+  // grava na tela de trás na hora, só quando a resposta é válida
+  if (wvalid(s)) { $(s.id).value = W[s.id]; update(); }
+  $('m-next').disabled = !wvalid(s);
+}
+function renderStep() {
+  const s = STEPS[cur];
+  $('m-count').textContent = editing ? 'Alterar resposta' : 'Pergunta ' + (cur + 1) + ' de ' + STEPS.length;
+  $('m-dots').innerHTML = editing ? '' : STEPS.map((x, i) => '<i class="' + (i <= cur ? 'on' : '') + '"></i>').join('');
+  $('m-q').textContent = s.q;
+  $('m-hint').textContent = s.hint;
+  $('m-body').innerHTML = '';
+  $('m-body').appendChild(bigEl(s));
+  $('m-back').hidden = editing || cur === 0;
+  $('m-example').hidden = editing || cur !== 0;
+  $('m-next').textContent = editing ? 'Salvar' : (cur === STEPS.length - 1 ? 'Ver resultado' : 'Continuar');
+  $('m-next').disabled = !wvalid(s);
+  setTimeout(() => { const i = $('m-body').querySelector('input'); if (i && !$('modal').hidden) { i.focus(); i.select(); } }, 30);
+}
+function nextStep() {
+  if (!wvalid(STEPS[cur])) return;
+  if (editing) { closeWizard(false); return; }
+  if (cur < STEPS.length - 1) { cur++; renderStep(); return; }
+  closeWizard(false);
+  goResult();
+}
+function backStep() { if (cur > 0) { cur--; renderStep(); } }
+function dismiss() { closeWizard(editing); }
+$('m-next').addEventListener('click', nextStep);
+$('m-back').addEventListener('click', backStep);
+$('m-example').addEventListener('click', () => { useExample(); closeWizard(false); goResult(); });
+$('m-close').addEventListener('click', dismiss);
+$('modal').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') { e.preventDefault(); nextStep(); }
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('modal').hidden) dismiss(); });
+$('modal').addEventListener('click', (e) => { if (e.target === $('modal')) dismiss(); });
+$('btn-perguntas').addEventListener('click', (e) => openWizard(e.currentTarget));
+$('chips').addEventListener('click', (e) => {
+  const c = e.target.closest('.chip');
+  if (c) openWizard(c, parseInt(c.getAttribute('data-i'), 10));
 });
 
 // barra de resultado (celular): some quando o resultado já está na tela
@@ -691,6 +846,7 @@ let rt;
 window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(update, 120); });
 buildPills();
 update();
+if (!ready) openWizard(null);
 </script>
 </body>
 </html>
