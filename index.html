@@ -3,263 +3,404 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Simulador de fila</title>
+<meta name="theme-color" content="#14313A">
+<title>Simulador da fila de psicologia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=EB+Garamond:wght@500;600&display=swap" rel="stylesheet">
 <style>
-/* Layout: uma coluna estreita (como app de celular). Hero com veredito e gráfico, depois blocos curtos. */
 :root {
-  --bg: #F5F7F6;
-  --surface: #FFFFFF;
-  --ink: #12201B;
-  --ink2: #5C7168;
-  --line: #D5E3DB;
-  --soft: #E3F1EA;
-  --accent: #17624F;
-  --accent-ink: #FFFFFF;
-  --good: #2C7A4B; --good-t: #226B3F; --good-bg: #DCEFE3;
-  --warn: #C28A1E; --warn-t: #8A5400; --warn-bg: #F8E8CC;
-  --bad: #B0352D;  --bad-t: #A32F27;  --bad-bg: #F8DDDA;
-  --scrim: rgba(18, 32, 27, 0.5);
-  --shadow: 0 1px 2px rgba(18, 32, 27, 0.05), 0 8px 24px rgba(18, 32, 27, 0.07);
-  --thumb: 0 1px 3px rgba(18, 32, 27, 0.14);
-  --display: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ink: #14313A;
+  --ink2: #4A6670;
+  --muted: #5C747D;
+  --paper: #F6F4EE;
+  --card: #FBFAF6;
+  --sage: #E4EDE8;
+  --line: #D6DDD6;
+  --teal: #2A8C7E;
+  --teal-d: #1B6B60;
+  --teal-l: #7AD0C0;
+  --coral: #E2825A;
+  --coral-d: #A94A25;
+  --gold-d: #8A6410;
+  --serif: "EB Garamond", Georgia, "Times New Roman", serif;
+  --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0B1411; --surface: #182B24; --ink: #E3F1EA; --ink2: #8EA79B; --line: #25392F; --soft: #1D3A2F;
-    --accent: #8EDBBA; --accent-ink: #12201B;
-    --good: #6CC596; --good-t: #6CC596; --good-bg: #1F4636;
-    --warn: #E3AE5A; --warn-t: #E3AE5A; --warn-bg: #3A2D14;
-    --bad: #F0847C;  --bad-t: #F0847C;  --bad-bg: #3E1D1B;
-    --scrim: rgba(5, 10, 8, 0.65);
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
-    --thumb: 0 1px 3px rgba(0, 0, 0, 0.4);
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #0B1411; --surface: #182B24; --ink: #E3F1EA; --ink2: #8EA79B; --line: #25392F; --soft: #1D3A2F;
-  --accent: #8EDBBA; --accent-ink: #12201B;
-  --good: #6CC596; --good-t: #6CC596; --good-bg: #1F4636;
-  --warn: #E3AE5A; --warn-t: #E3AE5A; --warn-bg: #3A2D14;
-  --bad: #F0847C;  --bad-t: #F0847C;  --bad-bg: #3E1D1B;
-  --scrim: rgba(5, 10, 8, 0.65);
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
-  --thumb: 0 1px 3px rgba(0, 0, 0, 0.4);
-  color-scheme: dark;
-}
-
 * { box-sizing: border-box; }
 html, body { margin: 0; }
-body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
-.wrap { max-width: 480px; margin: 0 auto; padding: 20px 16px 40px; display: flex; flex-direction: column; gap: 14px; }
-
-.top { display: flex; align-items: center; justify-content: space-between; min-height: 36px; }
-.brand { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
-.ghost { font: inherit; font-size: 14px; font-weight: 500; color: var(--accent); background: none; border: 0; cursor: pointer; padding: 8px 4px; border-radius: 8px; }
-.ghost:hover { text-decoration: underline; text-underline-offset: 3px; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-.card { background: var(--surface); border-radius: 20px; padding: 20px; box-shadow: var(--shadow); }
-
-/* hero */
-.hero { --st: var(--bad); --st-bg: var(--bad-bg); --st-t: var(--bad-t); }
-.hero.down { --st: var(--good); --st-bg: var(--good-bg); --st-t: var(--good-t); }
-.hero.flat { --st: var(--warn); --st-bg: var(--warn-bg); --st-t: var(--warn-t); }
-.pill { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; color: var(--st-t); background: var(--st-bg); padding: 5px 11px 5px 9px; border-radius: 999px; }
-.pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--st); }
-.hero h1 { font-family: var(--display); font-weight: 800; font-size: 30px; line-height: 1.12; letter-spacing: -0.02em; margin: 14px 0 6px; text-wrap: balance; }
-.hero .sub { margin: 0; color: var(--ink2); }
-.chart-wrap { position: relative; margin: 16px -4px -4px; }
-.chart-wrap svg { display: block; width: 100%; height: auto; touch-action: pan-y; overflow: visible; }
-.cap { fill: var(--ink2); font-family: var(--body); font-size: 12px; }
-.val { fill: var(--ink); font-family: var(--display); font-weight: 700; font-size: 14px; }
-.base { stroke: var(--line); stroke-width: 1; }
-.line { fill: none; stroke: var(--st); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-.dot { fill: var(--st); stroke: var(--surface); stroke-width: 3; }
-.cross { stroke: var(--ink2); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.6; }
-.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--surface); font-size: 13px; padding: 5px 9px; border-radius: 8px; white-space: nowrap; transform: translate(-50%, -100%); }
-
-/* linhas de controle */
-.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.row .lab { font-weight: 600; flex: 1; min-width: 0; }
-.row .lab small { display: block; font-weight: 400; color: var(--ink2); font-size: 13px; }
-
-.stepper { display: inline-flex; align-items: center; gap: 4px; }
-.stepper button { font: inherit; font-size: 20px; font-weight: 500; width: 38px; height: 38px; border-radius: 50%; border: 0; cursor: pointer; background: var(--soft); color: var(--ink); line-height: 1; }
-.stepper button:hover { background: var(--accent); color: var(--accent-ink); }
-.stepper input { font-family: var(--display); font-weight: 800; font-size: 22px; text-align: center; width: 44px; border: 0; background: transparent; color: var(--ink); -moz-appearance: textfield; font-variant-numeric: tabular-nums; padding: 0; }
-.stepper input:focus-visible { outline: none; box-shadow: 0 2px 0 var(--accent); }
-.stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.stepper input::placeholder { color: var(--ink2); font-weight: 500; opacity: 0.6; }
-
-/* psicólogos necessários */
-.seg { display: inline-flex; background: var(--soft); border-radius: 12px; padding: 3px; gap: 2px; }
-.seg button { font: inherit; font-size: 13.5px; font-weight: 500; color: var(--ink2); background: none; border: 0; padding: 6px 12px; border-radius: 9px; cursor: pointer; }
-.seg button:hover { color: var(--ink); }
-.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: var(--thumb); }
-.need .q { margin: 0 0 10px; font-weight: 600; }
-.need .num { display: flex; align-items: baseline; gap: 8px; margin-top: 16px; }
-.need .num b { font-family: var(--display); font-weight: 800; font-size: 44px; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
-.need .num span { color: var(--ink2); }
-.need .foot { display: flex; align-items: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
-.tag { font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--soft); color: var(--ink2); }
-.tag.bad { background: var(--bad-bg); color: var(--bad-t); }
-.tag.good { background: var(--good-bg); color: var(--good-t); }
-
-/* grupo */
-.add { font: inherit; font-size: 15px; font-weight: 600; width: 100%; min-height: 52px; border: 1.5px dashed var(--line); border-radius: 16px; background: transparent; color: var(--accent); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.add:hover { border-color: var(--accent); background: var(--surface); }
-.add b { font-size: 20px; font-weight: 500; line-height: 1; }
-.warn { color: var(--bad-t); }
-.g-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
-.g-row:first-child { border-top: 0; }
-.g-row .lab { font-weight: 600; font-size: 15px; flex: 1; min-width: 0; }
-.g-row .lab small { display: block; font-weight: 400; color: var(--ink2); font-size: 13px; }
-.g-list { margin: 14px 0 4px; }
-.need .small { margin: 10px 0 0; font-size: 13px; color: var(--ink2); }
-
-/* aviso */
-.aviso { display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 12px 14px; border-radius: 14px; background: var(--warn-bg); color: var(--warn-t); font-size: 13.5px; font-weight: 500; line-height: 1.4; }
-.aviso i { flex: none; width: 20px; height: 20px; border-radius: 50%; background: var(--warn-t); color: var(--warn-bg); font: 700 12px/20px var(--display); font-style: normal; text-align: center; }
-
-/* dados informados */
-.data { display: flex; flex-wrap: wrap; gap: 8px; }
-.data .t { width: 100%; font-size: 13px; color: var(--ink2); margin: 0 0 2px; }
-.chip { font: inherit; font-size: 13.5px; font-weight: 500; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
-.chip:hover { border-color: var(--accent); color: var(--accent); }
-.note { text-align: center; font-size: 12.5px; color: var(--ink2); margin: 0; }
-
-/* tela inicial */
-.start { text-align: center; padding: 36px 20px; }
-.start h1 { font-family: var(--display); font-weight: 800; font-size: 26px; line-height: 1.15; letter-spacing: -0.02em; margin: 0 0 8px; text-wrap: balance; }
-.start p { margin: 0 0 22px; color: var(--ink2); }
-
-.btn { font: inherit; font-weight: 600; font-size: 16px; cursor: pointer; border: 0; border-radius: 14px; min-height: 52px; padding: 0 22px; background: var(--accent); color: var(--accent-ink); }
-.btn:hover { filter: brightness(1.07); }
-.btn[disabled] { opacity: 0.35; cursor: not-allowed; filter: none; }
-
-/* popup */
-.overlay { position: fixed; inset: 0; background: var(--scrim); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
-.sheet { background: var(--surface); border-radius: 24px; width: min(420px, 100%); padding: 22px 22px 20px; box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3); max-height: calc(100% - 24px); overflow: auto; }
-.m-head { display: flex; align-items: center; justify-content: space-between; height: 28px; margin-bottom: 18px; }
-.dots { display: flex; gap: 6px; align-items: center; }
-.dots i { width: 22px; height: 4px; border-radius: 2px; background: var(--line); }
-.dots i.on { background: var(--accent); }
-.m-tag { font-size: 13px; font-weight: 600; color: var(--ink2); }
-.x { font: inherit; font-size: 22px; line-height: 1; width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--soft); color: var(--ink2); cursor: pointer; }
-.x:hover { color: var(--ink); }
-.sheet h2 { font-family: var(--display); font-weight: 800; font-size: 24px; line-height: 1.2; letter-spacing: -0.02em; margin: 0 0 8px; text-wrap: balance; }
-.m-hint { margin: 0; font-size: 14px; color: var(--ink2); }
-.m-input { display: flex; justify-content: center; margin: 26px 0 6px; }
-.big { display: flex; align-items: center; gap: 10px; }
-.big button { font: inherit; font-size: 28px; font-weight: 400; width: 56px; height: 56px; border-radius: 50%; border: 0; background: var(--soft); color: var(--ink); cursor: pointer; line-height: 1; flex: none; }
-.big button:hover { background: var(--accent); color: var(--accent-ink); }
-.big input { font-family: var(--display); font-weight: 800; font-size: 56px; letter-spacing: -0.03em; text-align: center; width: 150px; border: 0; border-bottom: 3px solid var(--line); border-radius: 0; background: transparent; color: var(--ink); -moz-appearance: textfield; font-variant-numeric: tabular-nums; padding: 0 0 2px; }
-.big input:focus { outline: none; border-bottom-color: var(--accent); }
-.big input::-webkit-outer-spin-button, .big input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.big input::placeholder { color: var(--line); }
-.m-live { min-height: 22px; margin: 8px 0 0; text-align: center; font-size: 14px; font-weight: 600; color: var(--accent); }
-.m-actions { display: flex; flex-direction: column; gap: 4px; margin-top: 12px; }
-.m-actions .ghost { align-self: center; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
 [hidden] { display: none !important; }
+svg { flex: none; }
+:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; border-radius: 6px; }
 
-@media (max-width: 600px) { .overlay { align-items: flex-start; padding-top: 7vh; } }
+/* ---------- topo ---------- */
+.top { background: var(--ink); color: var(--paper); }
+.top-in { max-width: 1120px; margin: 0 auto; padding: 28px 20px 30px; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px 24px; }
+h1 { font-family: var(--serif); font-weight: 600; font-size: clamp(30px, 5vw, 42px); line-height: 1.08; margin: 0 0 8px; letter-spacing: -0.01em; text-wrap: balance; }
+.sub { margin: 0; color: #C9D8D2; max-width: 52ch; font-size: 16.5px; }
+.top-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; border-radius: 999px; padding: 0 18px; min-height: 44px; border: 1.5px solid transparent; }
+.btn.fill { background: var(--coral); color: var(--ink); }
+.btn.fill:hover { background: #EC9774; }
+.btn.ghost { background: transparent; color: var(--paper); border-color: rgba(246, 244, 238, 0.45); }
+.btn.ghost:hover { background: rgba(246, 244, 238, 0.12); }
+.top :focus-visible { outline-color: var(--teal-l); }
+
+/* ---------- layout ---------- */
+.wrap { max-width: 1120px; margin: 0 auto; padding: 22px 20px 60px; }
+.grid { display: grid; grid-template-columns: minmax(300px, 390px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 22px; box-shadow: 0 10px 28px -22px rgba(20, 49, 58, 0.55); }
+.sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.badge { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--teal-d); color: #fff; font-weight: 700; font-size: 15px; display: grid; place-items: center; }
+h2 { font-family: var(--serif); font-weight: 600; font-size: 25px; line-height: 1.15; margin: 0; text-wrap: balance; }
+h3 { font-size: 15px; margin: 0 0 6px; }
+
+/* ---------- campos ---------- */
+.field { margin-bottom: 22px; }
+.field:last-child { margin-bottom: 0; }
+.q { display: block; font-weight: 700; font-size: 16px; margin-bottom: 10px; line-height: 1.3; }
+.hint { margin: 10px 0 0; font-size: 14px; color: var(--ink2); }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.unit { font-size: 14.5px; color: var(--ink2); }
+
+.stepper { display: inline-flex; align-items: center; gap: 4px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 999px; padding: 4px; }
+.stepper:focus-within { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(42, 140, 126, 0.18); }
+.stepper button { font: inherit; font-size: 16px; font-weight: 700; flex: none; min-width: 46px; height: 46px; padding: 0 6px; border-radius: 999px; border: 0; cursor: pointer; background: var(--sage); color: var(--teal-d); }
+.stepper button:hover { background: var(--teal-d); color: #fff; }
+.stepper button:active { transform: scale(0.96); }
+.stepper input { font: inherit; font-size: 23px; font-weight: 700; width: 88px; text-align: center; border: 0; background: transparent; color: var(--ink); -moz-appearance: textfield; font-variant-numeric: tabular-nums; padding: 0; }
+.stepper input:focus { outline: none; }
+.stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.stepper.small button { min-width: 40px; height: 40px; }
+.stepper.small input { font-size: 20px; width: 70px; }
+
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; background: var(--sage); border-radius: 14px; padding: 3px; }
+.seg button { font: inherit; font-size: 14px; font-weight: 500; line-height: 1.2; cursor: pointer; border: 0; background: transparent; color: var(--ink2); border-radius: 11px; padding: 8px 6px; min-height: 40px; }
+.seg button:hover { color: var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); font-weight: 700; box-shadow: 0 1px 4px rgba(20, 49, 58, 0.22); }
+
+
+.note { margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: var(--sage); border-left: 4px solid var(--teal); font-size: 14.5px; font-weight: 700; }
+
+.entering { margin-top: 24px; padding-top: 18px; border-top: 1.5px dashed var(--line); }
+.entering h3 { color: var(--ink2); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+.chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.chip { background: var(--paper); border-radius: 14px; padding: 10px 10px 9px; }
+.chip b { display: block; font-family: var(--serif); font-size: 26px; line-height: 1; font-weight: 600; font-variant-numeric: tabular-nums; }
+.chip span { display: block; margin-top: 4px; font-size: 12.5px; color: var(--ink2); line-height: 1.25; }
+
+/* ---------- resultado ---------- */
+.empty { margin-top: 18px; padding: 22px 18px; text-align: center; background: var(--sage); border-radius: 18px; color: var(--ink2); }
+.empty strong { display: block; color: var(--ink); font-family: var(--serif); font-size: 23px; font-weight: 600; margin-bottom: 4px; line-height: 1.2; }
+.tank { width: 150px; height: auto; margin: 0 auto 6px; display: block; }
+
+.verdict { display: flex; gap: 16px; align-items: flex-start; margin-top: 18px; padding: 18px; border-radius: 18px; background: var(--tint); border: 1.5px solid var(--tline); }
+.verdict .ic { flex: none; width: 48px; height: 48px; border-radius: 50%; background: var(--c); color: #fff; display: grid; place-items: center; }
+.verdict .main { margin: 0; font-family: var(--serif); font-weight: 600; font-size: clamp(22px, 3.4vw, 28px); line-height: 1.18; text-wrap: balance; }
+.verdict .more { margin: 6px 0 0; color: var(--ink2); font-size: 15.5px; }
+.verdict.up { --c: var(--coral-d); --tint: #FBEDE4; --tline: #F0CDBA; }
+.verdict.down { --c: var(--teal-d); --tint: #E4EDE8; --tline: #C3D8CF; }
+.verdict.flat { --c: var(--gold-d); --tint: #F7F0DC; --tline: #E7D9AC; }
+
+.key { margin: 14px 0 0; padding: 12px 14px; background: var(--sage); border-left: 4px solid var(--teal); border-radius: 12px; font-weight: 700; }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 10px; margin-top: 14px; }
+.tile { background: var(--paper); border-radius: 16px; padding: 14px 14px 12px; }
+.tile .v { font-family: var(--serif); font-weight: 600; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+.tile .l { margin-top: 6px; font-size: 13.5px; color: var(--ink2); line-height: 1.3; }
+
+.opt { margin-top: 18px; border: 1.5px solid var(--line); border-radius: 16px; background: var(--paper); }
+.opt > summary { cursor: pointer; padding: 13px 16px; font-weight: 700; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 48px; }
+.opt > summary::-webkit-details-marker { display: none; }
+.opt > summary::after { content: "+"; font-size: 22px; font-weight: 500; color: var(--teal-d); line-height: 1; }
+.opt[open] > summary::after { content: "−"; }
+.opt > .inner { padding: 4px 16px 18px; }
+.opt .hint { margin: 0 0 16px; }
+.warnbox { margin-top: 14px; padding: 10px 12px; border-left: 4px solid var(--coral-d); background: #FBEDE4; border-radius: 10px; font-size: 14.5px; font-weight: 500; }
+
+/* gráfico */
+.chart-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 14px; margin-bottom: 8px; }
+.chart-head .seg { min-width: 280px; }
+.chart-wrap { position: relative; width: 100%; }
+.chart-wrap svg { display: block; width: 100%; touch-action: pan-y; }
+.tick { fill: var(--muted); font-size: 12px; font-family: var(--sans); font-variant-numeric: tabular-nums; }
+.ylab { fill: var(--muted); font-size: 12px; font-family: var(--sans); }
+.endlabel { fill: var(--ink); font-size: 15px; font-weight: 700; font-family: var(--sans); font-variant-numeric: tabular-nums; }
+.gridline { stroke: #E3E6DF; stroke-width: 1; }
+.baseline { stroke: #B9C4BE; stroke-width: 1.5; }
+.line { fill: none; stroke: var(--teal); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.area { fill: var(--teal); opacity: 0.13; }
+.dot { fill: var(--teal); stroke: var(--card); stroke-width: 2; }
+.cross { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--paper); font-size: 13.5px; padding: 6px 10px; border-radius: 10px; white-space: nowrap; transform: translate(-50%, -100%); }
+.axis-note { margin: 6px 0 0; font-size: 13.5px; color: var(--ink2); }
+
+/* tabela */
+.tablewrap { overflow-x: auto; margin: 0 -6px; padding: 0 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 10px 10px; border-bottom: 1px solid #E3E6DF; }
+th { font-size: 13px; color: var(--ink2); font-weight: 700; white-space: nowrap; }
+tbody tr.pick { cursor: pointer; }
+tbody tr.pick:hover { background: var(--paper); }
+tbody tr.current { background: var(--sage); font-weight: 700; }
+tbody tr.current td:first-child { border-radius: 10px 0 0 10px; }
+tbody tr.current td:last-child { border-radius: 0 10px 10px 0; }
+td.st { display: flex; align-items: center; gap: 6px; }
+td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d); } td.flat, .t-flat { color: var(--gold-d); }
+.scroll { max-height: 260px; overflow: auto; }
+.tag { display: inline-block; margin-left: 6px; font-size: 12px; font-weight: 700; color: var(--teal-d); background: var(--card); border-radius: 999px; padding: 1px 8px; }
+
+/* blocos que abrem */
+.more-card { border: 1px solid var(--line); border-radius: 18px; background: var(--card); }
+.more-card > summary { cursor: pointer; padding: 16px 20px; font-family: var(--serif); font-size: 21px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 10px; min-height: 56px; }
+.more-card > summary::-webkit-details-marker { display: none; }
+.more-card > summary::after { content: "+"; font-family: var(--sans); font-size: 24px; font-weight: 500; color: var(--teal-d); }
+.more-card[open] > summary::after { content: "−"; }
+.more-card > .inner { padding: 0 20px 20px; font-size: 15.5px; }
+.more-card p { margin: 0 0 10px; }
+.more-card ul { margin: 0 0 12px; padding-left: 20px; }
+.more-card li { margin-bottom: 7px; }
+
+/* barra de resultado no celular */
+.livebar { display: none; }
+@media (max-width: 860px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  body { padding-bottom: 84px; }
+  .livebar:not([hidden]) { display: flex; position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 20; align-items: center; gap: 12px; background: var(--ink); color: var(--paper); border-radius: 18px; padding: 10px 10px 10px 14px; box-shadow: 0 12px 30px -8px rgba(20, 49, 58, 0.6); }
+  .livebar .lic { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--lc, var(--teal)); color: #fff; display: grid; place-items: center; }
+  .livebar .lt { flex: 1; font-weight: 700; font-size: 15px; line-height: 1.25; }
+  .livebar button { font: inherit; font-weight: 700; font-size: 14px; border: 0; border-radius: 999px; background: var(--coral); color: var(--ink); min-height: 40px; padding: 0 14px; cursor: pointer; }
+}
+@media (max-width: 560px) {
+  .top-in { padding: 18px 16px 20px; gap: 14px; }
+  h1 { font-size: 29px; margin-bottom: 6px; }
+  .sub { font-size: 15px; }
+  .btn { font-size: 13.5px; padding: 0 10px; min-height: 42px; }
+  .stepper button { min-width: 42px; height: 42px; }
+  .stepper input { width: 64px; font-size: 22px; }
+  .stepper.small input { width: 60px; }
+  .wrap { padding: 16px 12px 40px; }
+  .card { padding: 18px 16px; border-radius: 18px; }
+  .chart-head .seg { min-width: 0; width: 100%; }
+  th, td { padding: 9px 6px; font-size: 14px; vertical-align: top; }
+  th { white-space: normal; font-size: 12px; }
+  .verdict { gap: 12px; padding: 14px; }
+  .verdict .ic { width: 40px; height: 40px; }
+  .chips { gap: 6px; }
+  .chip b { font-size: 23px; }
+  .btn { flex: 1; }
+  .seg button { font-size: 13px; padding: 8px 3px; }
+}
 @media (prefers-reduced-motion: no-preference) {
-  .sheet { animation: rise 0.22s ease-out; }
-  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-  .btn, .chip, .seg button, .stepper button, .big button { transition: background 0.15s, color 0.15s, border-color 0.15s, filter 0.15s; }
-  .line { transition: stroke 0.2s; }
+  .btn, .stepper button, .seg button { transition: background 0.15s, color 0.15s; }
 }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="top">
-    <span class="brand">Simulador de fila</span>
-    <button type="button" class="ghost" id="btn-refazer" hidden>Refazer</button>
+<header class="top">
+  <div class="top-in">
+    <div>
+      <h1>Simulador da fila de psicologia</h1>
+      <p class="sub">Veja se a fila de espera cresce ou diminui com cada regra do protocolo.</p>
+    </div>
+    <div class="top-actions">
+      <button type="button" class="btn fill" id="btn-exemplo">Preencher com exemplo</button>
+      <button type="button" class="btn ghost" id="btn-limpar">Apagar todos os números</button>
+    </div>
   </div>
+</header>
 
-  <section class="card start" id="inicio">
-    <h1>Veja se a fila de espera vai crescer ou diminuir</h1>
-    <p>São 4 perguntas rápidas.</p>
-    <button type="button" class="btn" id="btn-comecar">Começar</button>
-  </section>
+<main class="wrap">
+  <div class="grid">
+    <!-- PASSO 1 -->
+    <section class="card" aria-labelledby="h-passo1">
+      <div class="sec-head"><span class="badge" aria-hidden="true">1</span><h2 id="h-passo1">Números da sua UBS</h2></div>
 
-  <div id="painel" hidden style="display:flex;flex-direction:column;gap:14px">
-    <section class="card hero" id="hero" aria-live="polite">
-      <span class="pill"><i></i><span id="h-pill"></span></span>
-      <h1 id="h-title"></h1>
-      <p class="sub" id="h-sub"></p>
-      <div class="chart-wrap" id="chart"></div>
-    </section>
+      <div class="field">
+        <label class="q" for="fila">Quantas pessoas estão na fila de espera hoje?</label>
+        <div class="row">
+          <div class="stepper" data-step="10">
+            <button type="button" data-d="-1" aria-label="Diminuir 10">−10</button>
+            <input id="fila" type="number" inputmode="numeric" min="0" max="100000" value="0">
+            <button type="button" data-d="1" aria-label="Aumentar 10">+10</button>
+          </div>
+          <span class="unit">pessoas</span>
+        </div>
+        <p class="hint">Conte na planilha da fila os nomes que ainda aguardam.</p>
+      </div>
 
-    <section class="card">
-      <div class="row">
-        <div class="lab">Sessões por paciente<small id="s-sub">Atendimento individual, até a alta</small></div>
-        <div id="mount-sessoes"></div>
+      <div class="field">
+        <label class="q" for="horarios">Qual é o total de atendimentos da UBS por semana?</label>
+        <div class="row">
+          <div class="stepper" data-step="1">
+            <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
+            <input id="horarios" type="number" inputmode="numeric" min="0" max="1000" value="0">
+            <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
+          </div>
+          <span class="unit">atendimentos por semana</span>
+        </div>
+        <p class="hint">Conte os atendimentos da agenda em que cabe um paciente. Dois pacientes quinzenais que dividem uma vaga contam como um atendimento só.</p>
+        <div class="note">Se houver mais de um profissional, some os atendimentos de todos.</div>
+      </div>
+
+      <div class="field">
+        <label class="q" for="entradas">Quantas pessoas entram na fila de espera por mês?</label>
+        <div class="row">
+          <div class="stepper" data-step="1">
+            <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
+            <input id="entradas" type="number" inputmode="numeric" min="0" max="10000" value="0">
+            <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
+          </div>
+          <span class="unit">pessoas por mês</span>
+        </div>
+        <p class="hint">Conte na planilha da fila quantos nomes foram incluídos em um mês comum, sem férias ou feriados longos, para fazer a estimativa.</p>
+      </div>
+
+      <div class="entering" id="entering" hidden>
+        <h3>O que a conta entendeu</h3>
+        <div class="chips" id="chips"></div>
       </div>
     </section>
 
-    <button type="button" class="add" id="g-add"><b>+</b> Adicionar atendimento em grupo</button>
-    <section class="card" id="g-card" hidden>
-      <div class="row">
-        <div class="lab" style="font-weight:600;flex:1;min-width:0">Atendimento em grupo<small id="g-line" style="display:block;font-weight:400;color:var(--ink2);font-size:13px"></small><small id="g-warn" class="warn" style="display:block;font-weight:500;font-size:13px" hidden></small></div>
-        <button type="button" class="ghost" id="g-edit">Editar</button>
-      </div>
-    </section>
+    <div class="col">
+      <!-- PASSO 2 -->
+      <section class="card" aria-labelledby="h-passo2">
+        <div class="sec-head"><span class="badge" aria-hidden="true">2</span><h2 id="h-passo2">Teste uma regra do protocolo</h2></div>
+        <div class="field" style="margin-bottom:0">
+          <label class="q" for="sessoes">Quantas sessões cada paciente faz até a alta?</label>
+          <div class="row">
+            <div class="stepper" data-step="1">
+              <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
+              <input id="sessoes" type="number" inputmode="numeric" min="1" max="60" value="8">
+              <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
+            </div>
+            <span class="unit">sessões por paciente</span>
+          </div>
+        </div>
 
-    <section class="card need">
-      <p class="q" id="n-q"></p>
-      <div class="seg" role="group" aria-label="Prazo" id="seg"></div>
-      <div class="num"><b id="n-num"></b><span id="n-unit"></span></div>
-      <div class="foot"><span class="tag" id="n-hoje"></span><span class="tag" id="n-status"></span></div>
-      <p class="small" id="n-nota"></p>
-    </section>
+        <div id="vazio" class="empty">
+          <svg class="tank" viewBox="0 0 170 112" aria-hidden="true">
+            <rect x="46" y="16" width="82" height="76" rx="14" fill="#fff" stroke="#14313A" stroke-width="2.5"/>
+            <path d="M50 54 q9 -7 18 0 t18 0 t18 0 t18 0 V80 a8 8 0 0 1 -8 8 H58 a8 8 0 0 1 -8 -8 Z" fill="#7AD0C0"/>
+            <path d="M8 28 H46" stroke="#2A8C7E" stroke-width="5" stroke-linecap="round"/>
+            <path d="M34 20 l10 8 -10 8" fill="none" stroke="#2A8C7E" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M128 82 H164" stroke="#E2825A" stroke-width="5" stroke-linecap="round"/>
+            <path d="M152 74 l10 8 -10 8" fill="none" stroke="#E2825A" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <strong>Preencha os números da sua UBS para ver o resultado.</strong>
+          Ou toque em “Preencher com exemplo” no alto da página.
+        </div>
 
-    <p class="aviso" id="aviso" role="note"><i aria-hidden="true">!</i><span>O cálculo não considera os horários de triagem.</span></p>
+        <div id="resultado" hidden>
+          <div class="verdict" id="banner" role="status" aria-live="polite">
+            <span class="ic" id="b-glyph" aria-hidden="true"></span>
+            <div>
+              <p class="main" id="b-main"></p>
+              <p class="more" id="b-more"></p>
+            </div>
+          </div>
+          <p class="key" id="chave"></p>
+          <div class="tiles" id="tiles"></div>
+        </div>
 
-    <div class="data" id="data">
-      <p class="t">Suas respostas. Toque para alterar.</p>
+        <details class="opt" id="mais">
+          <summary>Adicionar grupos (opcional)</summary>
+          <div class="inner">
+            <p class="hint">Cada grupo se encontra toda semana, com as mesmas pessoas, e ocupa 2 atendimentos da agenda por semana.</p>
+            <div class="field">
+              <label class="q" for="grupos">Quantos grupos por semana?</label>
+              <div class="stepper small" data-step="1">
+                <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
+                <input id="grupos" type="number" inputmode="numeric" min="0" max="50" value="0">
+                <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
+              </div>
+            </div>
+            <div class="field">
+              <label class="q" for="pgrupo">Quantas pessoas participam de cada grupo?</label>
+              <div class="stepper small" data-step="1">
+                <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
+                <input id="pgrupo" type="number" inputmode="numeric" min="1" max="30" value="8">
+                <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
+              </div>
+            </div>
+            <div class="field">
+              <label class="q" for="mgrupo">Quantos encontros tem cada grupo?</label>
+              <div class="stepper small" data-step="1">
+                <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
+                <input id="mgrupo" type="number" inputmode="numeric" min="1" max="52" value="8">
+                <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
+              </div>
+            </div>
+            <div class="warnbox" id="aviso-grupos" hidden></div>
+          </div>
+        </details>
+      </section>
+
+      <!-- GRÁFICO -->
+      <section class="card" id="card-grafico" aria-labelledby="h-graf" hidden>
+        <div class="chart-head">
+          <h2 id="h-graf">Pessoas na fila de espera</h2>
+          <div class="seg" role="group" aria-label="Período do gráfico" id="pills"></div>
+        </div>
+        <div class="chart-wrap" id="chart"></div>
+        <p class="axis-note">Linha de baixo: meses a partir de hoje. Toque ou passe o mouse no gráfico para ver cada mês.</p>
+      </section>
+
+      <!-- TABELA -->
+      <section class="card" id="card-tabela" aria-labelledby="h-tab" hidden>
+        <div class="sec-head"><h2 id="h-tab">Compare outras regras</h2></div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Sessões por paciente</th><th>Chamados por mês</th><th>O que acontece com a fila</th><th id="th-fim"></th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <p class="hint">Toque em uma linha para testar aquela regra.</p>
+      </section>
+
+      <details class="more-card">
+        <summary>Como a conta é feita</summary>
+        <div class="inner">
+          <p>Pense numa caixa d'água. A fila é a caixa: entra água por uma torneira e sai por um ralo.</p>
+          <ul>
+            <li><strong>Entram:</strong> as pessoas adicionadas à fila no mês. Exemplo: 16 por mês.</li>
+            <li><strong>Saem:</strong> cada paciente que termina o acompanhamento libera uma vaga, e o próximo da lista é chamado. Atendimentos por mês = atendimentos por semana × 4,33. Chamados por mês = atendimentos por mês ÷ sessões por paciente. Exemplo: 24 × 4,33 ≈ 104 atendimentos; com 8 sessões são 13 chamados.</li>
+            <li><strong>Saldo:</strong> entram menos chamados. Se for positivo, a fila cresce. Se for negativo, diminui.</li>
+            <li><strong>Espera de quem entra hoje:</strong> fila atual ÷ chamados por mês.</li>
+            <li><strong>Grupos:</strong> um grupo semanal usa 2 atendimentos por semana e atende todas as pessoas juntas. Um grupo de 8 pessoas com 8 encontros conclui 8 pessoas a cada 8 semanas.</li>
+          </ul>
+          <p><strong>Limites:</strong> o simulador mostra o melhor cenário. Considera que toda falta conta como sessão e que a agenda já segue o protocolo. Na prática, os acompanhamentos longos de hoje ocupam vagas que só abrem aos poucos. Também não considera férias, feriados nem encaixes de urgência.</p>
+        </div>
+      </details>
+
+      <details class="more-card" id="det-numeros" hidden>
+        <summary>Ver os números do gráfico</summary>
+        <div class="inner">
+          <div class="scroll tablewrap">
+            <table>
+              <thead><tr><th>Mês</th><th>Pessoas na fila</th></tr></thead>
+              <tbody id="tbody-meses"></tbody>
+            </table>
+          </div>
+        </div>
+      </details>
     </div>
-    <p class="note">Estimativa no melhor cenário, sem faltas, férias ou retornos à fila.</p>
   </div>
-</div>
+</main>
 
-<div class="overlay" id="modal" hidden>
-  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="m-q">
-    <div class="m-head">
-      <div class="dots" id="m-dots"></div>
-      <button type="button" class="x" id="m-close" aria-label="Fechar">×</button>
-    </div>
-    <h2 id="m-q"></h2>
-    <p class="m-hint" id="m-hint"></p>
-    <div class="m-input" id="m-body"></div>
-    <p class="m-live" id="m-live"></p>
-    <div class="m-actions">
-      <button type="button" class="btn" id="m-next">Continuar</button>
-      <button type="button" class="ghost" id="m-back">Voltar</button>
-    </div>
-  </div>
-</div>
-
-<div class="overlay" id="gmodal" hidden>
-  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="g-t">
-    <div class="m-head">
-      <span class="m-tag">Atendimento em grupo</span>
-      <button type="button" class="x" id="g-close" aria-label="Fechar">×</button>
-    </div>
-    <h2 id="g-t">Como funciona o grupo?</h2>
-    <div class="g-list" id="g-rows"></div>
-    <div class="m-actions">
-      <button type="button" class="btn" id="g-save">Adicionar</button>
-      <button type="button" class="ghost" id="g-remove" hidden>Remover grupo</button>
-    </div>
-  </div>
+<div class="livebar" id="livebar" hidden>
+  <span class="lic" id="live-ic" aria-hidden="true"></span>
+  <span class="lt" id="live-t"></span>
+  <button type="button" id="live-go">Ver resultado</button>
 </div>
 
 <script>
@@ -267,189 +408,54 @@ body { background: var(--bg); color: var(--ink); font-family: var(--body); font-
 const WEEKS = 4.33;
 
 function calc(p) {
-  // F fila, H atendimentos/semana da UBS, E entradas/mês, S sessões individuais por paciente, months prazo
-  // grupo: G encontros por semana, P pessoas por grupo, M encontros até a alta, W horários que cada encontro ocupa
-  const gEff = p.G > 0 ? Math.min(p.G, p.H / p.W) : 0;
-  const indivSlots = Math.max(0, p.H - gEff * p.W);
-  const indivOut = indivSlots * WEEKS / p.S;
-  const groupOut = gEff > 0 ? gEff * p.P * WEEKS / p.M : 0;
+  // p: F fila, H horários/semana, E entradas/mês, S sessões, G grupos, P pessoas/grupo, M encontros/grupo, months
+  const gEff = Math.min(p.G, p.H / 2);
+  const indivSlotsMonth = Math.max(0, p.H - 2 * gEff) * WEEKS;
+  const indivOut = p.S > 0 ? indivSlotsMonth / p.S : 0;
+  const groupOut = gEff > 0 && p.M > 0 ? gEff * p.P * WEEKS / p.M : 0;
   const out = indivOut + groupOut;
   const net = p.E - out;
   const q = [p.F];
   for (let t = 1; t <= p.months; t++) q.push(Math.max(0, q[t - 1] + net));
+  const need = p.E - groupOut;
+  let eq;
+  if (need <= 1e-9) eq = { kind: 'any' };
+  else if (indivSlotsMonth <= 1e-9) eq = { kind: 'none' };
+  else eq = { kind: 'max', n: Math.floor(indivSlotsMonth / need + 1e-9) };
   return {
-    out: out, net: net, q: q,
+    out: out, net: net, q: q, eq: eq, gEff: gEff,
+    wait: out > 0 ? p.F / out : Infinity,
     toZero: net < 0 && p.F > 0 ? p.F / (-net) : null,
     state: net >= 0.5 ? 'up' : net <= -0.5 ? 'down' : 'flat'
   };
 }
 
-function psicologosNecessarios(p) {
-  // p.atend = atendimentos por semana de um psicólogo. O grupo fica como configurado.
-  const groupOut = p.G > 0 ? p.G * p.P * WEEKS / p.M : 0;
-  const slotsFor = (target) => p.G * p.W + Math.max(0, target - groupOut) * p.S / WEEKS;
-  return {
-    stable: slotsFor(p.E) / p.atend,
-    zero: slotsFor(p.E + (p.months > 0 ? p.F / p.months : 0)) / p.atend
-  };
-}
 /*CALC-END*/
 
 const $ = (id) => document.getElementById(id);
 const nf0 = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 });
 const nf1 = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 });
 const fmt = (n) => nf0.format(Math.round(n));
-const plural = (n, a, b) => n + ' ' + (n === 1 ? a : b);
-
-const PERIODS = [[12, '1 ano'], [24, '2 anos'], [36, '3 anos']];
+const pessoas = (n) => (Math.round(n) === 1 ? '1 pessoa' : fmt(n) + ' pessoas');
+const PERIODS = [[6, '6 meses'], [12, '1 ano'], [24, '2 anos'], [36, '3 anos'], [60, '5 anos']];
+const X_STEP = { 6: 1, 12: 2, 24: 6, 36: 6, 60: 12 };
 let period = 24;
-const label = () => PERIODS.filter((x) => x[0] === period)[0][1];
 
-const FRESH = () => ({ psi: null, atend: null, fila: null, entradas: null, sessoes: 20, grupos: 0, pgrupo: 8, mgrupo: 8, hgrupo: 2 });
-let A = FRESH();
+const SVG0 = '<svg viewBox="0 0 24 24" width="SZ" height="SZ" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+const ICONS = {
+  up: '<path d="M12 19V5M5 12l7-7 7 7"/>',
+  down: '<path d="M12 5v14M5 12l7 7 7-7"/>',
+  flat: '<path d="M5 9h14M5 15h14"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  check: '<path d="M5 13l4 4L19 7"/>'
+};
+const ico = (k, sz) => SVG0.replace(/SZ/g, sz || 16) + ICONS[k] + '</svg>';
 
-const STEPS = [
-  { k: 'psi', q: 'Quantos psicólogos atendem na UBS?', min: 1, max: 50, step: 1,
-    hint: 'Conte só quem faz os atendimentos de acompanhamento.' },
-  { k: 'atend', q: 'Quantos atendimentos cada um faz por semana?', min: 1, max: 120, step: 1,
-    hint: 'Conte os horários marcados, mesmo os que faltam, sem as triagens. Se variar, use a média.',
-    live: () => (A.psi && A.atend) ? plural(A.psi, 'psicólogo', 'psicólogos') + ' × ' + A.atend + ' = ' + (A.psi * A.atend) + ' por semana' : '' },
-  { k: 'fila', q: 'Quantas pessoas estão na fila hoje?', min: 0, max: 100000, step: 10,
-    hint: 'Os nomes que ainda aguardam na planilha.' },
-  { k: 'entradas', q: 'Quantas pessoas entram na fila por mês?', min: 0, max: 10000, step: 1,
-    hint: 'A média de um mês comum. Na planilha: nomes incluídos ÷ meses.' }
-];
-
-/* ---------- campo numérico ---------- */
-function numberEl(f, onchange, kind, id) {
-  const wrap = document.createElement('div');
-  wrap.className = kind === 'big' ? 'big' : 'stepper';
-  const minus = document.createElement('button'); minus.type = 'button'; minus.textContent = '−'; minus.setAttribute('aria-label', 'Diminuir');
-  const plus = document.createElement('button'); plus.type = 'button'; plus.textContent = '+'; plus.setAttribute('aria-label', 'Aumentar');
-  const input = document.createElement('input');
-  input.type = 'number'; input.inputMode = 'numeric'; input.min = f.min; input.max = f.max; input.placeholder = '0';
-  if (id) input.id = id;
-  input.setAttribute('aria-label', f.q || 'Sessões por paciente');
-  if (A[f.k] == null && f.ex != null && kind === 'big') A[f.k] = f.ex;
-  input.value = A[f.k] == null ? '' : A[f.k];
-  const step = f.step || 1;
-  const set = (v) => { A[f.k] = v; input.value = v == null ? '' : v; onchange(); };
-  minus.addEventListener('click', () => set(A[f.k] == null ? f.min : Math.max(f.min, A[f.k] - step)));
-  plus.addEventListener('click', () => set(A[f.k] == null ? Math.max(f.min, step) : Math.min(f.max, A[f.k] + step)));
-  input.addEventListener('input', () => {
-    const v = parseInt(input.value, 10);
-    A[f.k] = isNaN(v) ? null : Math.min(f.max, Math.max(f.min, v));
-    onchange();
-  });
-  input.addEventListener('blur', () => { input.value = A[f.k] == null ? '' : A[f.k]; });
-  wrap.appendChild(minus); wrap.appendChild(input); wrap.appendChild(plus);
-  wrap._input = input;
-  return wrap;
+function num(id, min, max) {
+  const v = parseInt($(id).value, 10);
+  if (isNaN(v)) return min;
+  return Math.min(max, Math.max(min, v));
 }
-
-/* ---------- popup ---------- */
-let cur = 0, editing = false, backup = null;
-const valid = (s) => A[s.k] != null && A[s.k] >= s.min && A[s.k] <= s.max;
-const answered = () => STEPS.every(valid);
-
-function openStep(i, edit) {
-  cur = i; editing = !!edit;
-  backup = edit ? JSON.stringify(A) : null;
-  $('modal').hidden = false;
-  renderStep();
-}
-function closeModal() { $('modal').hidden = true; }
-
-function renderStep() {
-  const s = STEPS[cur];
-  if (editing) $('m-dots').innerHTML = '<span class="m-tag">Alterar resposta</span>';
-  else $('m-dots').innerHTML = STEPS.map((x, i) => '<i class="' + (i <= cur ? 'on' : '') + '"></i>').join('');
-  $('m-dots').setAttribute('aria-label', 'Pergunta ' + (cur + 1) + ' de ' + STEPS.length);
-  $('m-q').textContent = s.q;
-  $('m-hint').textContent = s.hint;
-  $('m-body').innerHTML = '';
-  $('m-body').appendChild(numberEl(s, refreshModal, 'big', 'f-' + s.k));
-  $('m-back').hidden = editing || cur === 0;
-  $('m-next').textContent = editing ? 'Salvar' : (cur === STEPS.length - 1 ? 'Ver resultado' : 'Continuar');
-  refreshModal();
-  setTimeout(() => { const i = $('m-body').querySelector('input'); if (i && !$('modal').hidden) { i.focus(); i.select(); } }, 30);
-}
-function refreshModal() {
-  const s = STEPS[cur];
-  $('m-next').disabled = !valid(s);
-  $('m-live').textContent = s.live ? s.live() : '';
-}
-function nextStep() {
-  if (!valid(STEPS[cur])) return;
-  if (editing) { closeModal(); update(); return; }
-  if (cur < STEPS.length - 1) { cur++; renderStep(); return; }
-  closeModal(); update(); window.scrollTo(0, 0);
-}
-function backStep() {
-  if (editing) { A = JSON.parse(backup); closeModal(); update(); return; }
-  if (cur > 0) { cur--; renderStep(); }
-}
-function dismiss() { if (editing) backStep(); else { closeModal(); update(); } }
-$('m-next').addEventListener('click', nextStep);
-$('m-back').addEventListener('click', backStep);
-$('m-close').addEventListener('click', dismiss);
-$('modal').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') { e.preventDefault(); nextStep(); }
-  else if (e.key === 'Escape') dismiss();
-});
-$('btn-comecar').addEventListener('click', () => { const i = STEPS.findIndex((s) => !valid(s)); openStep(i < 0 ? 0 : i, false); });
-$('btn-refazer').addEventListener('click', () => { A = FRESH(); sess.sync(); update(); openStep(0, false); });
-
-/* ---------- grupo ---------- */
-const GFIELDS = [
-  { k: 'grupos', q: 'Encontros por semana', sub: 'Quantas vezes o grupo acontece', min: 1, max: 20, step: 1 },
-  { k: 'pgrupo', q: 'Pessoas por grupo', sub: 'Quantas participam de cada encontro', min: 2, max: 30, step: 1 },
-  { k: 'mgrupo', q: 'Encontros até a alta', sub: 'Quantos encontros cada pessoa faz', min: 1, max: 52, step: 1 },
-  { k: 'hgrupo', q: 'Horários por encontro', sub: 'Um encontro de 1 hora ocupa cerca de 2', min: 1, max: 8, step: 1 }
-];
-let gBackup = null;
-function gValid() { return GFIELDS.every((f) => A[f.k] != null && A[f.k] >= f.min && A[f.k] <= f.max); }
-function openGroup() {
-  gBackup = JSON.stringify(A);
-  if (!(A.grupos > 0)) { A.grupos = 1; A.pgrupo = 8; A.mgrupo = 8; A.hgrupo = 2; }
-  const rows = $('g-rows');
-  rows.innerHTML = '';
-  GFIELDS.forEach((f) => {
-    const r = document.createElement('div'); r.className = 'g-row';
-    const lab = document.createElement('div'); lab.className = 'lab';
-    lab.innerHTML = f.q + '<small>' + f.sub + '</small>';
-    r.appendChild(lab);
-    r.appendChild(numberEl(f, () => { $('g-save').disabled = !gValid(); }, 'small', 'g-' + f.k));
-    rows.appendChild(r);
-  });
-  const existed = JSON.parse(gBackup).grupos > 0;
-  $('g-save').textContent = existed ? 'Salvar' : 'Adicionar';
-  $('g-save').disabled = !gValid();
-  $('g-remove').hidden = !existed;
-  $('gmodal').hidden = false;
-  setTimeout(() => { const i = rows.querySelector('input'); if (i) { i.focus(); i.select(); } }, 30);
-}
-function closeGroup(save) {
-  if (save && !gValid()) return;
-  if (!save) A = JSON.parse(gBackup);
-  $('gmodal').hidden = true;
-  update();
-}
-$('g-add').addEventListener('click', openGroup);
-$('g-edit').addEventListener('click', openGroup);
-$('g-save').addEventListener('click', () => closeGroup(true));
-$('g-close').addEventListener('click', () => closeGroup(false));
-$('g-remove').addEventListener('click', () => { A.grupos = 0; A.pgrupo = 8; A.mgrupo = 8; A.hgrupo = 2; $('gmodal').hidden = true; update(); });
-$('gmodal').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') { e.preventDefault(); closeGroup(true); }
-  else if (e.key === 'Escape') closeGroup(false);
-});
-
-/* ---------- resultado ---------- */
-const sess = { st: null, sync() { if (this.st && document.activeElement !== this.st._input) this.st._input.value = A.sessoes == null ? '' : A.sessoes; } };
-sess.st = numberEl({ k: 'sessoes', min: 1, max: 60, step: 1 }, () => update(), 'small', 'f-sessoes');
-$('mount-sessoes').appendChild(sess.st);
-
 function dur(m) {
   if (!isFinite(m)) return 'sem previsão';
   if (m > 600) return 'mais de 50 anos';
@@ -457,120 +463,147 @@ function dur(m) {
   if (m < 24) { const r = Math.round(m); return r === 1 ? '1 mês' : r + ' meses'; }
   return nf1.format(m / 12) + ' anos';
 }
+const periodLabel = () => PERIODS.filter((x) => x[0] === period)[0][1];
 
-function update() {
-  const ready = answered();
-  $('inicio').hidden = ready;
-  $('painel').hidden = !ready;
-  $('btn-refazer').hidden = !ready;
-  if (!ready) {
-    $('btn-comecar').textContent = STEPS.some((s) => A[s.k] != null) ? 'Continuar' : 'Começar';
-    return;
-  }
-  sess.sync();
-  const S = A.sessoes || 20;
-  // regra usada: a cada 3 meses, cerca de 12 sessões por paciente (1 por semana)
-  const mesesAcomp = S / 4;
-  $('s-sub').textContent = 'Cerca de ' + (mesesAcomp < 1 ? 'menos de 1 mês' : mesesAcomp === 1 ? '1 mês' : nf1.format(mesesAcomp) + ' meses') + ' de acompanhamento';
-  const p = { F: A.fila, H: A.psi * A.atend, E: A.entradas, S: S, months: period, atend: A.atend, G: A.grupos, P: A.pgrupo, M: A.mgrupo, W: A.hgrupo };
-  const r = calc(p);
-  const need = psicologosNecessarios(p);
-  const end = r.q[r.q.length - 1];
-  const n = Math.round(Math.abs(r.net));
-
-  // veredito
-  $('hero').className = 'card hero ' + r.state;
-  let pill, title, sub;
-  if (r.state === 'up') {
-    pill = 'Fila crescendo'; title = 'A fila vai crescer';
-    sub = plural(n, 'pessoa a mais', 'pessoas a mais') + ' por mês. Em ' + label() + ', ' + fmt(end) + ' esperando.';
-  } else if (r.state === 'down' && p.F > 0) {
-    pill = 'Fila diminuindo'; title = 'A fila vai diminuir';
-    sub = plural(n, 'pessoa a menos', 'pessoas a menos') + ' por mês. Ela zera em ' + dur(r.toZero) + '.';
-  } else if (r.state === 'down') {
-    pill = 'Sem fila'; title = 'A fila não se forma';
-    sub = 'A equipe chama mais gente por mês do que entra.';
-  } else {
-    pill = 'Fila estável'; title = 'A fila fica parada';
-    sub = p.F > 0 ? 'As ' + fmt(p.F) + ' pessoas que esperam continuam esperando.' : 'Ninguém na fila e ninguém acumulando.';
-  }
-  $('h-pill').textContent = pill;
-  $('h-title').textContent = title;
-  $('h-sub').textContent = sub;
-  drawChart(r.q, period);
-
-  // atendimentos por semana que cada psicólogo precisa fazer, com a equipe de hoje (número inteiro)
-  const zero = p.F > 0;
-  const alvo = zero ? need.zero : need.stable;
-  const porPsi = alvo * A.atend / A.psi;
-  const total = Math.max(1, Math.ceil(Math.round(porPsi * 10) / 10 - 1e-9));
-  const falta = Math.max(0, total - A.atend);
-  $('n-q').textContent = zero ? 'Para zerar a fila em' : 'Para a fila não se formar';
-  $('seg').hidden = !zero;
-  $('n-num').textContent = total;
-  $('n-unit').textContent = (total === 1 ? 'atendimento' : 'atendimentos') + ' por semana' + (A.psi > 1 ? ' cada\u00a0um' : '');
-  $('n-hoje').textContent = 'Hoje fazem ' + A.atend;
-  const st = $('n-status');
-  if (falta > 0) { st.className = 'tag bad'; st.textContent = 'Faltam ' + falta; }
-  else { st.className = 'tag good'; st.textContent = 'Já é suficiente'; }
-  $('n-nota').textContent = A.psi > 1
-    ? plural(A.psi, 'psicólogo', 'psicólogos') + ', ' + (total * A.psi) + ' atendimentos por semana no total' + (A.grupos > 0 ? ', com o grupo que você adicionou.' : '.')
-    : (A.grupos > 0 ? 'Com o grupo que você adicionou.' : '');
-
-  // grupo
-  const temGrupo = A.grupos > 0;
-  $('g-add').hidden = temGrupo;
-  $('g-card').hidden = !temGrupo;
-  if (temGrupo) {
-    $('g-line').textContent = plural(A.grupos, 'encontro', 'encontros') + ' por semana, ' + A.pgrupo + ' pessoas, ' + plural(A.mgrupo, 'encontro', 'encontros') + ' até a alta';
-    const over = A.grupos * A.hgrupo > p.H;
-    $('g-warn').hidden = !over;
-    if (over) $('g-warn').textContent = 'O grupo pede mais horários do que a equipe tem. Reduza os encontros.';
-  }
-
-  // dados informados
-  const items = [
-    plural(A.psi, 'psicólogo', 'psicólogos'),
-    A.atend + ' atendimentos por semana',
-    A.fila + ' na fila',
-    A.entradas + ' entram por mês'
-  ];
-  const box = $('data');
-  box.innerHTML = '<p class="t">Suas respostas. Toque para alterar.</p>';
-  items.forEach((t, i) => {
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = t;
-    b.addEventListener('click', () => openStep(i, true));
-    box.appendChild(b);
-  });
+function read() {
+  return {
+    F: num('fila', 0, 100000), H: num('horarios', 0, 1000), E: num('entradas', 0, 10000), S: num('sessoes', 1, 60),
+    G: num('grupos', 0, 50), P: num('pgrupo', 1, 30), M: num('mgrupo', 1, 52),
+    months: period
+  };
 }
 
-/* ---------- gráfico ---------- */
+let ready = false, verdictSeen = false;
+function syncBar() { $('livebar').hidden = !(ready && !verdictSeen); }
+
+function update() {
+  const p = read();
+  ready = p.H > 0 && (p.F > 0 || p.E > 0);
+  $('vazio').hidden = ready;
+  $('resultado').hidden = !ready;
+  $('card-grafico').hidden = !ready;
+  $('card-tabela').hidden = !ready;
+  $('det-numeros').hidden = !ready;
+  $('entering').hidden = !ready;
+
+  const aviso = $('aviso-grupos');
+  if (p.G * 2 > p.H && p.H > 0) {
+    aviso.hidden = false;
+    aviso.textContent = 'Os grupos pedem ' + (p.G * 2) + ' atendimentos por semana, mas a agenda só tem ' + p.H + '. Reduza o número de grupos.';
+  } else aviso.hidden = true;
+
+  if (!ready) { verdictSeen = false; syncBar(); return; }
+
+  const r = calc(p);
+  const end = r.q[r.q.length - 1];
+  $('chips').innerHTML = [
+    [fmt(p.H), 'atendimentos por semana'],
+    [nf1.format(p.E), 'entram na fila por mês'],
+    [fmt(r.out), 'chamados da fila por mês']
+  ].map((c) => '<div class="chip"><b>' + c[0] + '</b><span>' + c[1] + '</span></div>').join('');
+
+  // faixa de resultado
+  $('banner').className = 'verdict ' + r.state;
+  $('b-glyph').innerHTML = ico(r.state, 26);
+  const n = Math.round(Math.abs(r.net));
+  let main, more;
+  if (r.state === 'up') {
+    main = 'Com ' + p.S + (p.S === 1 ? ' sessão' : ' sessões') + ' por paciente, a fila cresce cerca de ' + pessoas(n) + ' por mês.';
+    more = 'Em ' + periodLabel() + ', a fila iria de ' + fmt(p.F) + ' para cerca de ' + fmt(end) + ' pessoas.';
+  } else if (r.state === 'down') {
+    main = 'Com ' + p.S + (p.S === 1 ? ' sessão' : ' sessões') + ' por paciente, a fila diminui cerca de ' + pessoas(n) + ' por mês.';
+    more = p.F > 0 ? 'Contando quem continua entrando, a fila zeraria em cerca de ' + dur(r.toZero) + '.' : 'Hoje não há ninguém na fila.';
+  } else {
+    main = 'Com ' + p.S + (p.S === 1 ? ' sessão' : ' sessões') + ' por paciente, a fila fica praticamente parada.';
+    more = p.F > 0 ? 'As ' + fmt(p.F) + ' pessoas que já esperam continuam esperando.' : 'Ninguém na fila e ninguém acumulando.';
+  }
+  $('b-main').textContent = main;
+  $('b-more').textContent = more;
+
+  // barra do celular
+  const lc = { up: 'var(--coral-d)', down: 'var(--teal)', flat: 'var(--gold-d)' }[r.state];
+  $('live-ic').style.setProperty('--lc', lc);
+  $('live-ic').innerHTML = ico(r.state, 18);
+  $('live-t').textContent = r.state === 'up' ? 'A fila cresce cerca de ' + pessoas(n) + ' por mês' : r.state === 'down' ? 'A fila diminui cerca de ' + pessoas(n) + ' por mês' : 'A fila fica praticamente parada';
+  syncBar();
+
+  // frase-chave
+  let chave;
+  if (r.eq.kind === 'any') chave = 'Com esses grupos, a fila não cresce, qualquer número de sessões individuais serve.';
+  else if (r.eq.kind === 'none') chave = 'Os grupos ocupam todos os atendimentos da agenda. Reduza os grupos para sobrar atendimento individual.';
+  else if (r.eq.n < 1) chave = 'Mesmo com 1 sessão por paciente, a fila cresce nesta UBS.';
+  else chave = 'Para a fila parar de crescer nesta UBS, cada paciente poderia fazer no máximo ' + r.eq.n + (r.eq.n === 1 ? ' sessão.' : ' sessões.') + ' Acima disso, a fila aumenta.';
+  $('chave').textContent = chave;
+
+  // números principais
+  const tiles = [
+    [fmt(r.out), 'Chamados da fila por mês'],
+    [nf1.format(p.E), 'Entram na fila por mês'],
+    [p.F > 0 ? dur(r.wait) : 'sem espera', 'Espera de quem entra hoje'],
+    [fmt(end), 'Pessoas na fila daqui a ' + periodLabel()]
+  ];
+  $('tiles').innerHTML = tiles.map((t) => '<div class="tile"><div class="v">' + t[0] + '</div><div class="l">' + t[1] + '</div></div>').join('');
+
+  drawChart(r.q, period);
+  fillTable(p, r);
+  fillMonths(r.q);
+}
+
+function fillTable(p, cur) {
+  const set = {};
+  [4, 5, 6, 7, 8, 10, 12, 16, 20, p.S].forEach((s) => { set[s] = 1; });
+  const list = Object.keys(set).map(Number).sort((a, b) => a - b);
+  $('th-fim').textContent = 'Fila daqui a ' + periodLabel();
+  $('tbody').innerHTML = list.map((s) => {
+    const x = calc({ F: p.F, H: p.H, E: p.E, S: s, G: p.G, P: p.P, M: p.M, months: p.months });
+    const m = Math.round(Math.abs(x.net));
+    const txt = x.state === 'up' ? 'cresce ' + m + ' por mês' : x.state === 'down' ? 'diminui ' + m + ' por mês' : 'praticamente parada';
+    return '<tr class="pick' + (s === p.S ? ' current' : '') + '" tabindex="0" data-s="' + s + '"><td>' + s + (s === p.S ? '<span class="tag">escolhida</span>' : '') + '</td><td>' + fmt(x.out) + '</td><td class="' + x.state + '"><span style="display:inline-flex;align-items:center;gap:6px">' + ico(x.state, 14) + txt + '</span></td><td>' + fmt(x.q[x.q.length - 1]) + '</td></tr>';
+  }).join('');
+}
+
+function fillMonths(q) {
+  $('tbody-meses').innerHTML = q.map((v, t) => '<tr><td>' + (t === 0 ? 'Hoje' : t) + '</td><td>' + fmt(v) + '</td></tr>').join('');
+}
+
+function niceScale(v) {
+  if (v <= 0) return { step: 2, max: 10 };
+  const raw = v / 4;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const norm = raw / mag;
+  const step = (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 2.5 ? 2.5 : norm <= 5 ? 5 : 10) * mag;
+  return { step: step, max: Math.ceil(v / step - 1e-9) * step };
+}
+
 function drawChart(q, N) {
   const wrap = $('chart');
-  const W = Math.max(260, wrap.clientWidth || 400), H = 150;
-  const m = { l: 14, r: 14, t: 34, b: 26 };
+  const W = Math.max(280, wrap.clientWidth || 600);
+  const H = 250;
+  const m = { l: 46, r: 48, t: 28, b: 30 };
   const iw = W - m.l - m.r, ih = H - m.t - m.b;
-  const max = Math.max(Math.max.apply(null, q), 1);
+  const sc = niceScale(Math.max.apply(null, q));
   const X = (t) => m.l + iw * t / N;
-  const Y = (v) => m.t + ih * (1 - v / max);
+  const Y = (v) => m.t + ih * (1 - v / sc.max);
+  let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Gráfico da fila: de ' + fmt(q[0]) + ' pessoas hoje para ' + fmt(q[N]) + ' em ' + periodLabel() + '">';
+  s += '<text class="ylab" x="' + m.l + '" y="12">pessoas na fila</text>';
+  for (let v = 0; v <= sc.max + 1e-9; v += sc.step) {
+    s += '<line class="' + (v === 0 ? 'baseline' : 'gridline') + '" x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + Y(v) + '" y2="' + Y(v) + '"/>';
+    s += '<text class="tick" x="' + (m.l - 8) + '" y="' + (Y(v) + 4) + '" text-anchor="end">' + nf0.format(v) + '</text>';
+  }
+  const st = X_STEP[N] || 6;
+  for (let t = 0; t <= N; t += st) {
+    s += '<text class="tick" x="' + X(t) + '" y="' + (H - 8) + '" text-anchor="' + (t === 0 ? 'start' : t === N ? 'end' : 'middle') + '">' + (t === 0 ? 'hoje' : t) + '</text>';
+  }
   let d = '';
   q.forEach((v, t) => { d += (t === 0 ? 'M' : 'L') + X(t).toFixed(1) + ' ' + Y(v).toFixed(1) + ' '; });
-  const area = d + 'L' + X(N).toFixed(1) + ' ' + Y(0) + ' L' + X(0).toFixed(1) + ' ' + Y(0) + ' Z';
-  const x0 = X(0), y0 = Y(q[0]), x1 = X(N), y1 = Y(q[N]);
-  let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Fila de ' + fmt(q[0]) + ' pessoas hoje para ' + fmt(q[N]) + ' em ' + label() + '">';
-  s += '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--st);stop-opacity:.22"/><stop offset="1" style="stop-color:var(--st);stop-opacity:0"/></linearGradient></defs>';
-  s += '<line class="base" x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + Y(0) + '" y2="' + Y(0) + '"/>';
-  s += '<path d="' + area + '" fill="url(#g)"/>';
+  s += '<path class="area" d="' + d + 'L' + X(N).toFixed(1) + ' ' + Y(0) + ' L' + X(0).toFixed(1) + ' ' + Y(0) + ' Z"/>';
   s += '<path class="line" d="' + d + '"/>';
-  s += '<circle class="dot" cx="' + x0 + '" cy="' + y0 + '" r="6"/>';
-  s += '<circle class="dot" cx="' + x1 + '" cy="' + y1 + '" r="6"/>';
-  s += '<text class="val" x="' + x0 + '" y="' + (y0 - 14) + '" text-anchor="start">' + fmt(q[0]) + '</text>';
-  s += '<text class="val" x="' + x1 + '" y="' + (y1 - 14) + '" text-anchor="end">' + fmt(q[N]) + '</text>';
-  s += '<text class="cap" x="' + x0 + '" y="' + (H - 6) + '" text-anchor="start">Hoje</text>';
-  s += '<text class="cap" x="' + x1 + '" y="' + (H - 6) + '" text-anchor="end">Em ' + label() + '</text>';
+  s += '<circle class="dot" cx="' + X(0) + '" cy="' + Y(q[0]) + '" r="5"/>';
+  s += '<circle class="dot" cx="' + X(N) + '" cy="' + Y(q[N]) + '" r="5"/>';
+  s += '<text class="endlabel" x="' + (X(N) + 10) + '" y="' + (Y(q[N]) + 5) + '">' + nf0.format(Math.round(q[N])) + '</text>';
   s += '<line class="cross" id="cross" x1="0" x2="0" y1="' + m.t + '" y2="' + Y(0) + '" visibility="hidden"/>';
-  s += '<circle class="dot" id="hdot" r="5" cx="0" cy="0" visibility="hidden"/>';
-  s += '<rect id="hit" x="0" y="0" width="' + W + '" height="' + H + '" fill="transparent"/>';
+  s += '<circle class="dot" id="hdot" r="6" cx="0" cy="0" visibility="hidden"/>';
+  s += '<rect id="hit" x="' + m.l + '" y="0" width="' + iw + '" height="' + H + '" fill="transparent"/>';
   s += '</svg><div class="tip" id="tip" hidden></div>';
   wrap.innerHTML = s;
 
@@ -583,30 +616,81 @@ function drawChart(q, N) {
     cross.setAttribute('x1', x); cross.setAttribute('x2', x); cross.setAttribute('visibility', 'visible');
     hdot.setAttribute('cx', x); hdot.setAttribute('cy', y); hdot.setAttribute('visibility', 'visible');
     tip.hidden = false;
-    tip.textContent = (t === 0 ? 'Hoje' : 'Mês ' + t) + ': ' + plural(Math.round(q[t]), 'pessoa', 'pessoas');
-    tip.style.left = Math.max(60, Math.min(wrap.clientWidth - 60, x * (box.width / W))) + 'px';
+    tip.textContent = (t === 0 ? 'Hoje' : 'Daqui a ' + t + (t === 1 ? ' mês' : ' meses')) + ': ' + pessoas(q[t]);
+    const left = Math.max(70, Math.min(wrap.clientWidth - 70, x * (box.width / W)));
+    tip.style.left = left + 'px';
     tip.style.top = Math.max(26, y * (box.height / H) - 12) + 'px';
   }
-  function hide() { cross.setAttribute('visibility', 'hidden'); hdot.setAttribute('visibility', 'hidden'); tip.hidden = true; }
+  function hide() {
+    cross.setAttribute('visibility', 'hidden'); hdot.setAttribute('visibility', 'hidden'); tip.hidden = true;
+  }
   hit.addEventListener('pointermove', show);
   hit.addEventListener('pointerdown', show);
   hit.addEventListener('pointerleave', hide);
   hit.addEventListener('pointercancel', hide);
 }
 
-function buildSeg() {
-  $('seg').innerHTML = PERIODS.map((x) => '<button type="button" data-m="' + x[0] + '" aria-pressed="' + (x[0] === period) + '">' + x[1] + '</button>').join('');
-  $('seg').querySelectorAll('button').forEach((bt) => {
-    bt.addEventListener('click', () => { period = parseInt(bt.getAttribute('data-m'), 10); buildSeg(); update(); });
+// ligações
+document.querySelectorAll('.stepper').forEach((st) => {
+  const input = st.querySelector('input');
+  const step = parseInt(st.getAttribute('data-step'), 10) || 1;
+  st.querySelectorAll('button').forEach((bt) => {
+    bt.addEventListener('click', () => {
+      const min = parseInt(input.min, 10) || 0, max = parseInt(input.max, 10) || 100000;
+      const cur = parseInt(input.value, 10) || 0;
+      input.value = Math.min(max, Math.max(min, cur + step * parseInt(bt.getAttribute('data-d'), 10)));
+      update();
+    });
+  });
+  input.addEventListener('input', update);
+  input.addEventListener('focus', () => { setTimeout(() => { try { input.select(); } catch (e) {} }, 0); });
+});
+
+function segHtml(list, cur) {
+  return list.map((x) => '<button type="button" data-v="' + x[0] + '" aria-pressed="' + (x[0] === cur) + '">' + x[1] + '</button>').join('');
+}
+function buildPills() {
+  $('pills').innerHTML = segHtml(PERIODS, period);
+  $('pills').querySelectorAll('button').forEach((bt) => {
+    bt.addEventListener('click', () => { period = parseInt(bt.getAttribute('data-v'), 10); buildPills(); update(); });
   });
 }
-buildSeg();
+
+$('tbody').addEventListener('click', (e) => {
+  const tr = e.target.closest('tr.pick');
+  if (tr) { $('sessoes').value = tr.getAttribute('data-s'); update(); }
+});
+$('tbody').addEventListener('keydown', (e) => {
+  const tr = e.target.closest('tr.pick');
+  if (tr && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); $('sessoes').value = tr.getAttribute('data-s'); update(); }
+});
+
+function setAll(v) {
+  Object.keys(v).forEach((k) => { $(k).value = v[k]; });
+}
+const RESET = { grupos: 0, pgrupo: 8, mgrupo: 8 };
+$('btn-exemplo').addEventListener('click', () => {
+  setAll(Object.assign({}, RESET, { fila: 477, horarios: 24, entradas: 16, sessoes: 8 }));
+  update();
+});
+$('btn-limpar').addEventListener('click', () => {
+  setAll(Object.assign({}, RESET, { fila: 0, horarios: 0, entradas: 0, sessoes: 8 }));
+  update();
+});
+
+// barra de resultado (celular): some quando o resultado já está na tela
+$('live-go').addEventListener('click', () => {
+  const calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $('h-passo2').scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
+});
+if ('IntersectionObserver' in window) {
+  new IntersectionObserver((es) => { verdictSeen = es[0].isIntersecting; syncBar(); }, { threshold: 0.25 }).observe($('banner'));
+}
 
 let rt;
-window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (answered()) update(); }, 120); });
-
+window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(update, 120); });
+buildPills();
 update();
-openStep(0, false);
 </script>
 </body>
 </html>
