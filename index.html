@@ -1,10 +1,13 @@
 <!DOCTYPE html>
+<!--
+  O bloco de cálculo (groupParts e calc) define a conta do simulador. Altere com cuidado.
+-->
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#14313A">
-<title>Simulador da fila de psicologia</title>
+<title>Simulador da lista de espera</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=EB+Garamond:wght@500;600&display=swap" rel="stylesheet">
@@ -44,12 +47,12 @@ svg { flex: none; }
 /* ---------- topo ---------- */
 .top { background: var(--ink); color: var(--paper); }
 .top-in { max-width: 1120px; margin: 0 auto; padding: 28px 20px 30px; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px 24px; }
-h1 { font-family: var(--serif); font-weight: 600; font-size: clamp(30px, 5vw, 42px); line-height: 1.08; margin: 0 0 8px; letter-spacing: -0.01em; text-wrap: balance; }
+h1 { font-family: var(--sans); font-weight: 700; font-size: clamp(30px, 5vw, 42px); line-height: 1.08; margin: 0 0 8px; letter-spacing: -0.01em; text-wrap: balance; }
 .sub { margin: 0; color: #C9D8D2; max-width: 52ch; font-size: 16.5px; }
 .top-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .btn { font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; border-radius: 999px; padding: 0 18px; min-height: 44px; border: 1.5px solid transparent; }
-.btn.fill { background: var(--coral); color: var(--ink); }
-.btn.fill:hover { background: #EC9774; }
+.btn.fill { background: var(--teal-l); color: var(--ink); }
+.btn.fill:hover { background: #9BDDD0; }
 .btn.ghost { background: transparent; color: var(--paper); border-color: rgba(246, 244, 238, 0.45); }
 .btn.ghost:hover { background: rgba(246, 244, 238, 0.12); }
 .top :focus-visible { outline-color: var(--teal-l); }
@@ -61,7 +64,7 @@ h1 { font-family: var(--serif); font-weight: 600; font-size: clamp(30px, 5vw, 42
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 22px; box-shadow: 0 10px 28px -22px rgba(20, 49, 58, 0.55); }
 .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
 .badge { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--teal-d); color: #fff; font-weight: 700; font-size: 15px; display: grid; place-items: center; }
-h2 { font-family: var(--serif); font-weight: 600; font-size: 25px; line-height: 1.15; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--sans); font-weight: 700; font-size: 23px; line-height: 1.15; margin: 0; text-wrap: balance; }
 h3 { font-size: 15px; margin: 0 0 6px; }
 
 /* ---------- campos ---------- */
@@ -71,6 +74,14 @@ h3 { font-size: 15px; margin: 0 0 6px; }
 .hint { margin: 10px 0 0; font-size: 14px; color: var(--ink2); }
 .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .unit { font-size: 14.5px; color: var(--ink2); }
+.qrow { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
+.qrow .q { margin-bottom: 0; }
+.qmark { font: inherit; font-size: 14px; font-weight: 700; flex: none; width: 26px; height: 26px; margin: -1px 0 0; padding: 0; border-radius: 50%; border: 1.5px solid var(--teal); background: var(--card); color: var(--teal-d); cursor: pointer; position: relative; }
+.qmark::before { content: ""; position: absolute; inset: -9px; }
+.qmark:hover, .qmark[aria-expanded="true"] { background: var(--teal-d); border-color: var(--teal-d); color: #fff; }
+.ajuda { display: none; padding: 10px 12px; background: var(--sage); border-radius: 12px; }
+.field.aberta .ajuda { display: block; }
+@media (hover: hover) { .field:has(.qmark:hover) .ajuda { display: block; } }
 
 .stepper { display: inline-flex; align-items: center; gap: 4px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 999px; padding: 4px; }
 .stepper:focus-within { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(42, 140, 126, 0.18); }
@@ -110,6 +121,7 @@ h3 { font-size: 15px; margin: 0 0 6px; }
 .verdict .ic { flex: none; width: 48px; height: 48px; border-radius: 50%; background: var(--c); color: #fff; display: grid; place-items: center; }
 .verdict .main { margin: 0; font-family: var(--serif); font-weight: 600; font-size: clamp(22px, 3.4vw, 28px); line-height: 1.18; text-wrap: balance; }
 .verdict .more { margin: 6px 0 0; color: var(--ink2); font-size: 15.5px; }
+.repos-box { margin: 12px 0 0; padding: 10px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.75); border-left: 4px solid var(--c); font-size: 15px; font-weight: 700; color: var(--ink); }
 .verdict.up { --c: var(--coral-d); --tint: #FBEDE4; --tline: #F0CDBA; }
 .verdict.down { --c: var(--teal-d); --tint: #E4EDE8; --tline: #C3D8CF; }
 .verdict.flat { --c: var(--gold-d); --tint: #F7F0DC; --tline: #E7D9AC; }
@@ -216,6 +228,23 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
   @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 }
 
+/* tour guiado */
+.tour-veil { position: fixed; z-index: 60; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.tour-ring { position: fixed; z-index: 61; border: 3px solid var(--teal-l); border-radius: 18px; pointer-events: none; box-shadow: 0 0 0 4px rgba(122, 208, 192, 0.25), 0 0 0 200vmax rgba(20, 49, 58, 0.55); }
+.tour-tip { position: fixed; z-index: 62; width: min(340px, calc(100vw - 24px)); background: var(--card); color: var(--ink); border-radius: 20px; padding: 16px 18px 14px; box-shadow: 0 20px 50px rgba(10, 30, 36, 0.45); }
+.tour-n { margin: 0 0 4px; font-size: 13px; font-weight: 700; color: var(--ink2); }
+.tour-t { margin: 0; font-size: 16px; line-height: 1.45; }
+.tour-b { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+.tour-b .sp { flex: 1; }
+.tour-b button { font: inherit; font-weight: 700; font-size: 15px; border: 0; border-radius: 999px; min-height: 44px; padding: 0 18px; cursor: pointer; }
+.tour-b .go { background: var(--teal-d); color: #fff; }
+.tour-b .go:hover { background: #155a50; }
+.tour-b .quiet { background: transparent; color: var(--ink2); padding: 0 10px; }
+.tour-b .quiet:hover { color: var(--ink); }
+@media (prefers-reduced-motion: no-preference) {
+  .tour-ring, .tour-tip { transition: top 0.25s ease, left 0.25s ease, width 0.25s ease, height 0.25s ease; }
+}
+
 /* barra de resultado no celular */
 .livebar { display: none; }
 @media (max-width: 860px) {
@@ -224,7 +253,7 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
   .livebar:not([hidden]) { display: flex; position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 20; align-items: center; gap: 12px; background: var(--ink); color: var(--paper); border-radius: 18px; padding: 10px 10px 10px 14px; box-shadow: 0 12px 30px -8px rgba(20, 49, 58, 0.6); }
   .livebar .lic { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--lc, var(--teal)); color: #fff; display: grid; place-items: center; }
   .livebar .lt { flex: 1; font-weight: 700; font-size: 15px; line-height: 1.25; }
-  .livebar button { font: inherit; font-weight: 700; font-size: 14px; border: 0; border-radius: 999px; background: var(--coral); color: var(--ink); min-height: 40px; padding: 0 14px; cursor: pointer; }
+  .livebar button { font: inherit; font-weight: 700; font-size: 14px; border: 0; border-radius: 999px; background: var(--teal-l); color: var(--ink); min-height: 40px; padding: 0 14px; cursor: pointer; }
 }
 @media (max-width: 560px) {
   .top-in { padding: 18px 16px 20px; gap: 14px; }
@@ -259,10 +288,11 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
 <header class="top">
   <div class="top-in">
     <div>
-      <h1>Simulador da fila de psicologia</h1>
-      <p class="sub">Veja se a fila de espera cresce ou diminui com cada regra do protocolo.</p>
+      <h1>Simulador da lista de espera</h1>
+      <p class="sub">Ferramenta para projeção da fila de espera de psicologia a partir dos dados da(s) unidade(s) de atenção primária à saúde e das variáveis escolhidas.</p>
     </div>
     <div class="top-actions">
+      <button type="button" class="btn ghost" id="btn-tour">Como usar</button>
       <button type="button" class="btn fill" id="btn-exemplo">Preencher com exemplo</button>
       <button type="button" class="btn ghost" id="btn-limpar">Apagar todos os números</button>
     </div>
@@ -271,64 +301,133 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
 
 <main class="wrap">
   <div class="grid">
-    <!-- PASSO 1 -->
-    <section class="card" aria-labelledby="h-passo1">
-      <div class="sec-head"><span class="badge" aria-hidden="true">1</span><h2 id="h-passo1">Números da sua UBS</h2></div>
-
-      <div class="field">
-        <label class="q" for="fila">Quantas pessoas estão na fila de espera hoje?</label>
-        <div class="row">
-          <div class="stepper solo">
-            <input id="fila" type="number" inputmode="numeric" min="0" max="100000" value="0">
-          </div>
-          <span class="unit">pessoas</span>
-        </div>
-        <p class="hint">Conte na planilha da fila os nomes que ainda aguardam.</p>
-      </div>
-
-      <div class="field">
-        <label class="q" for="horarios">Qual é o total de atendimentos da UBS por semana?</label>
-        <div class="row">
-          <div class="stepper" data-step="1">
-            <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
-            <input id="horarios" type="number" inputmode="numeric" min="0" max="1000" value="0">
-            <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
-          </div>
-          <span class="unit">atendimentos por semana</span>
-        </div>
-        <p class="hint">Some os atendimentos de uma semana de todos os profissionais da UBS.<br>Cada atendimento conta 1.<br>Não conte as triagens.</p>
-      </div>
-
-      <div class="field">
-        <label class="q" for="entradas">Quantas pessoas entram na fila de espera por mês?</label>
-        <div class="row">
-          <div class="stepper" data-step="1">
-            <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
-            <input id="entradas" type="number" inputmode="numeric" min="0" max="10000" value="0">
-            <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
-          </div>
-          <span class="unit">pessoas por mês</span>
-        </div>
-        <p class="hint">Conte na planilha da fila quantos nomes foram incluídos em um mês comum, sem férias ou feriados longos, para fazer a estimativa.</p>
-      </div>
-    </section>
-
     <div class="col">
-      <!-- PASSO 2 -->
-      <section class="card" aria-labelledby="h-passo2">
-        <div class="sec-head"><span class="badge" aria-hidden="true">2</span><h2 id="h-passo2">Teste uma regra do protocolo</h2></div>
-        <div class="field" style="margin-bottom:0">
-          <label class="q" for="sessoes">Quantas sessões cada paciente faz até a alta?</label>
+      <!-- PASSO 1 -->
+      <section class="card" aria-labelledby="h-passo1">
+        <div class="sec-head"><span class="badge" aria-hidden="true">1</span><h2 id="h-passo1">Dados da(s) unidade(s)</h2></div>
+
+        <div class="field">
+          <div class="qrow"><label class="q" for="fila">Quantas pessoas estão na fila de espera hoje?</label><button type="button" class="qmark" aria-expanded="false" aria-controls="ajuda-fila" aria-label="Como contar">?</button></div>
           <div class="row">
             <div class="stepper" data-step="1">
               <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
-              <input id="sessoes" type="number" inputmode="numeric" min="1" max="60" value="20">
+              <input id="fila" type="number" inputmode="numeric" min="0" max="100000" value="0">
               <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
             </div>
-            <span class="unit">sessões por paciente</span>
+            <span class="unit">pessoas</span>
           </div>
+          <p class="hint ajuda" id="ajuda-fila">Conte na planilha da fila os nomes que ainda aguardam.</p>
         </div>
 
+        <div class="field">
+          <div class="qrow"><label class="q" for="horarios">Quantas vagas de atendimento a(s) unidade(s) tem por semana?</label><button type="button" class="qmark" aria-expanded="false" aria-controls="ajuda-horarios" aria-label="Como contar">?</button></div>
+          <div class="row">
+            <div class="stepper" data-step="1">
+              <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
+              <input id="horarios" type="number" inputmode="numeric" min="0" max="100000" value="0">
+              <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
+            </div>
+            <span class="unit">vagas por semana</span>
+          </div>
+          <p class="hint ajuda" id="ajuda-horarios">Some as vagas da agenda de todos os psicólogos da(s) unidade(s) em uma semana, sem contar as triagens.</p>
+        </div>
+
+        <div class="field">
+          <div class="qrow"><label class="q" for="entradas">Quantas pessoas entram na fila de espera por mês?</label><button type="button" class="qmark" aria-expanded="false" aria-controls="ajuda-entradas" aria-label="Como contar">?</button></div>
+          <div class="row">
+            <div class="stepper" data-step="1">
+              <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
+              <input id="entradas" type="number" inputmode="numeric" min="0" max="100000" value="0">
+              <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
+            </div>
+            <span class="unit">pessoas por mês</span>
+          </div>
+          <p class="hint ajuda" id="ajuda-entradas">Conte na planilha da fila quantos nomes foram incluídos em um mês comum, sem férias ou feriados longos, para fazer a estimativa.</p>
+        </div>
+      </section>
+      <!-- PASSO 2 -->
+      <section class="card" aria-labelledby="h-passo2">
+        <div class="sec-head"><span class="badge" aria-hidden="true">2</span><h2 id="h-passo2">Variáveis</h2></div>
+        <details class="opt" id="sess" open>
+          <summary>Sessões por paciente</summary>
+          <div class="inner">
+            <div class="field">
+              <label class="q" for="sessoes">Quantas sessões cada paciente faz no mínimo?</label>
+              <div class="row">
+                <div class="stepper" data-step="1">
+                  <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
+                  <input id="sessoes" type="number" inputmode="numeric" min="1" max="60" value="" placeholder="0">
+                  <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
+                </div>
+                <span class="unit">sessões por paciente</span>
+              </div>
+              <p class="hint">O resultado mostra o melhor cenário. Quando um paciente faz mais sessões que o mínimo, a fila anda mais devagar.</p>
+            </div>
+          </div>
+        </details>
+
+        <details class="opt" id="mais">
+          <summary>Grupos</summary>
+          <div class="inner">
+            <p class="hint">Cada grupo se encontra sempre com as mesmas pessoas e ocupa algumas vagas da agenda.</p>
+            <div class="field">
+              <label class="q" for="grupos">Quantos grupos por semana?</label>
+              <div class="stepper small" data-step="1">
+                <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
+                <input id="grupos" type="number" inputmode="numeric" min="0" max="2000" value="0">
+                <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
+              </div>
+            </div>
+            <div class="field">
+              <label class="q" for="vgrupo">Quantas vagas da agenda cada grupo ocupa?</label>
+              <div class="stepper small" data-step="1">
+                <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
+                <input id="vgrupo" type="number" inputmode="numeric" min="1" max="20" value="" placeholder="0">
+                <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
+              </div>
+              <p class="hint">Conte quantas vagas o tempo do grupo tira da agenda. Exemplo: 1 hora de grupo = 2 vagas. Se mais de um psicólogo conduz o grupo, some as vagas de todos.</p>
+            </div>
+            <div class="field">
+              <label class="q" for="pgrupo">Quantas pessoas participam de cada grupo?</label>
+              <div class="stepper small" data-step="1">
+                <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
+                <input id="pgrupo" type="number" inputmode="numeric" min="1" max="30" value="" placeholder="0">
+                <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
+              </div>
+            </div>
+            <div class="field">
+              <label class="q" for="mgrupo">Quantos encontros tem cada grupo?</label>
+              <div class="stepper small" data-step="1">
+                <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
+                <input id="mgrupo" type="number" inputmode="numeric" min="1" max="52" value="" placeholder="0">
+                <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
+              </div>
+            </div>
+            <div class="warnbox" id="aviso-grupos" hidden></div>
+          </div>
+        </details>
+        <details class="opt" id="faltas">
+          <summary>Faltas</summary>
+          <div class="inner">
+            <div class="field">
+              <label class="q" for="repos">Limite de faltas justificadas</label>
+              <div class="stepper small" data-step="1">
+                <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
+                <input id="repos" type="number" inputmode="numeric" min="0" max="20" value="0">
+                <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
+              </div>
+              <p class="hint">Selecione o limite de faltas justificadas do paciente, ou seja, as faltas que podem ser repostas.</p>
+            </div>
+          </div>
+        </details>
+
+      </section>
+    </div>
+
+    <div class="col">
+      <!-- PASSO 3 -->
+      <section class="card" aria-labelledby="h-passo3">
+        <div class="sec-head"><span class="badge" aria-hidden="true">3</span><h2 id="h-passo3">Projeção da fila</h2></div>
         <div id="vazio" class="empty">
           <svg class="tank" viewBox="0 0 170 112" aria-hidden="true">
             <rect x="46" y="16" width="82" height="76" rx="14" fill="#fff" stroke="#14313A" stroke-width="2.5"/>
@@ -338,10 +437,8 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
             <path d="M128 82 H164" stroke="#E2825A" stroke-width="5" stroke-linecap="round"/>
             <path d="M152 74 l10 8 -10 8" fill="none" stroke="#E2825A" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <strong>Preencha os números da sua UBS para ver o resultado.</strong>
-          São 3 perguntas rápidas, uma de cada vez.
-          <div><button type="button" class="mbtn go" id="btn-perguntas">Responder às 3 perguntas</button></div>
-          Ou toque em “Preencher com exemplo” no alto da página.
+          <strong>Preencha os dados para ver o resultado.</strong>
+          Responda às 3 perguntas da parte 1 e preencha as sessões por paciente. Ou toque em “Preencher com exemplo” no alto da página.
         </div>
 
         <div id="resultado" hidden>
@@ -350,52 +447,14 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
             <div>
               <p class="main" id="b-main"></p>
               <p class="more" id="b-more"></p>
+              <p class="repos-box" id="b-repos" hidden></p>
             </div>
           </div>
-          <p class="aviso" role="note"><i aria-hidden="true">!</i><span><strong>Atenção:</strong> o exemplo usa dados fictícios, em um cenário ideal. A conta supõe que toda vaga que libera é ocupada na hora pelo próximo da fila, e não considera triagens, faltas, férias, feriados nem encaixes de urgência. Com dados reais, o resultado pode ser pior.</span></p>
-          <p class="key" id="chave"></p>
-          <div class="zero" id="zero">
-            <p class="zero-t">Para zerar a fila, cada paciente poderia fazer no máximo:</p>
-            <div class="tiles three" id="zero-tiles"></div>
-          </div>
+          <p class="aviso" role="note"><i aria-hidden="true">!</i><span><strong>Atenção:</strong> a projeção mostra um cenário ideal. A conta supõe que a agenda já segue o protocolo desde hoje e que toda vaga que libera é ocupada na hora pelo próximo da fila. Também não considera triagens, férias, feriados nem encaixes de urgência. Na prática, os acompanhamentos longos que já estão em andamento terminam aos poucos, e a fila tende a andar mais devagar do que a projeção mostra. As desistências da fila também não entram na conta. Elas fazem a fila andar um pouco mais rápido.</span></p>
+          <p class="zero-t" style="margin:18px 0 0">Valores aproximados:</p>
           <div class="tiles" id="tiles"></div>
-          <div class="dados">
-            <p class="dados-t">Seus dados. Toque para alterar.</p>
-            <div class="chips" id="chips"></div>
-          </div>
         </div>
 
-        <details class="opt" id="mais">
-          <summary>Adicionar grupos (opcional)</summary>
-          <div class="inner">
-            <p class="hint">Cada grupo se encontra toda semana, com as mesmas pessoas, e ocupa 2 atendimentos da agenda por semana.</p>
-            <div class="field">
-              <label class="q" for="grupos">Quantos grupos por semana?</label>
-              <div class="stepper small" data-step="1">
-                <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
-                <input id="grupos" type="number" inputmode="numeric" min="0" max="50" value="0">
-                <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
-              </div>
-            </div>
-            <div class="field">
-              <label class="q" for="pgrupo">Quantas pessoas participam de cada grupo?</label>
-              <div class="stepper small" data-step="1">
-                <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
-                <input id="pgrupo" type="number" inputmode="numeric" min="1" max="30" value="8">
-                <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
-              </div>
-            </div>
-            <div class="field">
-              <label class="q" for="mgrupo">Quantos encontros tem cada grupo?</label>
-              <div class="stepper small" data-step="1">
-                <button type="button" data-d="-1" aria-label="Diminuir 1">−</button>
-                <input id="mgrupo" type="number" inputmode="numeric" min="1" max="52" value="8">
-                <button type="button" data-d="1" aria-label="Aumentar 1">+</button>
-              </div>
-            </div>
-            <div class="warnbox" id="aviso-grupos" hidden></div>
-          </div>
-        </details>
       </section>
 
       <!-- GRÁFICO -->
@@ -410,14 +469,14 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
 
       <!-- TABELA -->
       <section class="card" id="card-tabela" aria-labelledby="h-tab" hidden>
-        <div class="sec-head"><h2 id="h-tab">Compare outras regras</h2></div>
+        <div class="sec-head"><h2 id="h-tab">Compare outras variáveis</h2></div>
         <div class="tablewrap">
           <table>
             <thead><tr><th>Sessões por paciente</th><th>Chamados por mês</th><th>O que acontece com a fila</th><th id="th-fim"></th></tr></thead>
             <tbody id="tbody"></tbody>
           </table>
         </div>
-        <p class="hint">Toque em uma linha para testar aquela regra.</p>
+        <p class="hint">Toque em uma linha para testar aquele número de sessões.</p>
       </section>
 
       <details class="more-card">
@@ -426,44 +485,34 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
           <p>Pense numa caixa d'água. A fila é a caixa: entra água por uma torneira e sai por um ralo.</p>
           <ul>
             <li><strong>Entram:</strong> as pessoas adicionadas à fila a cada mês, o número que você informou.</li>
-            <li><strong>Saem:</strong> cada paciente que termina o acompanhamento libera uma vaga, e o próximo da lista é chamado. Os atendimentos por mês são os atendimentos por semana multiplicados por 4, porque o mês conta como 4 semanas. Os chamados por mês são os atendimentos por mês divididos pelas sessões de cada paciente. Quanto mais sessões por paciente, menos vagas abrem.</li>
+            <li><strong>Saem:</strong> cada paciente que termina o acompanhamento libera uma vaga, e o próximo da lista é chamado. As vagas por mês são as vagas por semana multiplicadas por 4,33, porque um mês tem em média 4,33 semanas (52 semanas ÷ 12 meses). Os chamados por mês são as vagas por mês divididas pelas sessões de cada paciente. Quanto mais sessões por paciente, menos vagas abrem.</li>
             <li><strong>Saldo:</strong> entram menos chamados. Se for positivo, a fila cresce. Se for negativo, diminui.</li>
             <li><strong>Espera de quem entra hoje:</strong> fila atual ÷ chamados por mês.</li>
-            <li><strong>Sessões para zerar:</strong> a fila zera no prazo quando os chamados por mês são pelo menos as entradas por mês mais a fila ÷ meses do prazo. O máximo de sessões é os atendimentos por mês ÷ esse número, arredondado para baixo. Se houver grupos, os chamados deles são descontados antes.</li>
-            <li><strong>Grupos:</strong> um grupo semanal usa 2 atendimentos por semana e atende todas as pessoas juntas. As pessoas do grupo concluem ao mesmo tempo, depois do último encontro, e então todas liberam vaga de uma vez.</li>
+            <li><strong>Limite de faltas justificadas:</strong> no pior caso, cada paciente usa o mínimo de sessões mais todas as reposições. A conta é a mesma, com esse número maior de sessões.</li>
+            <li><strong>Grupos:</strong> um grupo semanal usa o número de vagas por semana que você informar e atende todas as pessoas juntas. As pessoas do grupo concluem ao mesmo tempo, depois do último encontro, e então todas liberam vaga de uma vez.</li>
           </ul>
-          <p><strong>Limites:</strong> o simulador mostra o melhor cenário. Considera que toda falta conta como sessão e que a agenda já segue o protocolo. Na prática, os acompanhamentos longos de hoje ocupam vagas que só abrem aos poucos. Também não considera férias, feriados nem encaixes de urgência.</p>
+          <p><strong>Limites:</strong> o simulador mostra o melhor cenário. Considera que toda falta que não é reposta conta como sessão feita e que a agenda já segue o protocolo. Na prática, os acompanhamentos longos de hoje ocupam vagas que só abrem aos poucos. Também não considera férias, feriados nem encaixes de urgência.</p>
         </div>
       </details>
 
-      <details class="more-card" id="det-numeros" hidden>
-        <summary>Ver os números do gráfico</summary>
-        <div class="inner">
-          <div class="scroll tablewrap">
-            <table>
-              <thead><tr><th>Mês</th><th>Pessoas na fila</th></tr></thead>
-              <tbody id="tbody-meses"></tbody>
-            </table>
-          </div>
-        </div>
-      </details>
     </div>
   </div>
 </main>
 
-<div class="overlay" id="modal" hidden>
-  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="m-q">
-    <div class="m-head">
-      <div><span class="m-count" id="m-count"></span><div class="dots" id="m-dots" aria-hidden="true"></div></div>
-      <button type="button" class="x" id="m-close" aria-label="Fechar">×</button>
-    </div>
-    <h2 id="m-q"></h2>
-    <p class="m-hint" id="m-hint"></p>
-    <div class="m-input" id="m-body"></div>
-    <div class="m-actions">
-      <button type="button" class="mbtn go" id="m-next">Continuar</button>
-      <button type="button" class="mbtn quiet" id="m-back">Voltar</button>
-      <button type="button" class="mbtn quiet" id="m-example">Preencher com exemplo</button>
+<div id="tour" hidden>
+  <div class="tour-veil" id="tv-top"></div>
+  <div class="tour-veil" id="tv-bottom"></div>
+  <div class="tour-veil" id="tv-left"></div>
+  <div class="tour-veil" id="tv-right"></div>
+  <div class="tour-ring" id="tour-ring"></div>
+  <div class="tour-tip" id="tour-tip" role="dialog" aria-modal="true" aria-labelledby="tour-t">
+    <p class="tour-n" id="tour-n"></p>
+    <p class="tour-t" id="tour-t"></p>
+    <div class="tour-b">
+      <button type="button" class="quiet" id="tour-skip">Pular</button>
+      <span class="sp"></span>
+      <button type="button" class="quiet" id="tour-back">Voltar</button>
+      <button type="button" class="go" id="tour-next">Próximo</button>
     </div>
   </div>
 </div>
@@ -475,44 +524,30 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
 </div>
 
 <script>
-/*CALC-START*/
-const WEEKS = 4;
-
-function calc(p) {
-  // p: F fila, H horários/semana, E entradas/mês, S sessões, G grupos, P pessoas/grupo, M encontros/grupo, months
-  const gEff = Math.min(p.G, p.H / 2);
-  const indivSlotsMonth = Math.max(0, p.H - 2 * gEff) * WEEKS;
-  const indivOut = p.S > 0 ? indivSlotsMonth / p.S : 0;
+const WEEKS = 52 / 12; // semanas em um mês, em média
+// V = atendimentos da agenda que cada grupo ocupa por semana
+function groupParts(p) {
+  const V = p.V;
+  if (!(V > 0 && p.P > 0 && p.M > 0)) return { gEff: 0, indivMonth: Math.max(0, p.H) * WEEKS, groupOut: 0 };
+  const gEff = Math.min(p.G, p.H / V);
+  const indivMonth = Math.max(0, p.H - V * gEff) * WEEKS;
   const groupOut = gEff > 0 && p.M > 0 ? gEff * p.P * WEEKS / p.M : 0;
-  const out = indivOut + groupOut;
+  return { gEff: gEff, indivMonth: indivMonth, groupOut: groupOut };
+}
+function calc(p) {
+  const g = groupParts(p);
+  const indivOut = p.S > 0 ? g.indivMonth / p.S : 0;
+  const out = indivOut + g.groupOut;
   const net = p.E - out;
   const q = [p.F];
   for (let t = 1; t <= p.months; t++) q.push(Math.max(0, q[t - 1] + net));
-  const need = p.E - groupOut;
-  let eq;
-  if (need <= 1e-9) eq = { kind: 'any' };
-  else if (indivSlotsMonth <= 1e-9) eq = { kind: 'none' };
-  else eq = { kind: 'max', n: Math.floor(indivSlotsMonth / need + 1e-9) };
   return {
-    out: out, net: net, q: q, eq: eq, gEff: gEff,
+    out: out, net: net, q: q, gEff: g.gEff,
     wait: out > 0 ? p.F / out : Infinity,
-    toZero: net < 0 && p.F > 0 ? p.F / (-net) : null,
+    toZero: net < 0 && p.F > 0 ? p.F / -net : null,
     state: net >= 0.5 ? 'up' : net <= -0.5 ? 'down' : 'flat'
   };
 }
-
-
-function maxSessions(p, months) {
-  // maior número de sessões por paciente para a fila zerar em "months" meses
-  const gEff = Math.min(p.G, p.H / 2);
-  const indivSlotsMonth = Math.max(0, p.H - 2 * gEff) * WEEKS;
-  const groupOut = gEff > 0 && p.M > 0 ? gEff * p.P * WEEKS / p.M : 0;
-  const need = p.E + p.F / months - groupOut;
-  if (need <= 1e-9) return { kind: 'any' };
-  if (indivSlotsMonth <= 1e-9) return { kind: 'none' };
-  return { kind: 'max', n: Math.floor(indivSlotsMonth / need + 1e-9) };
-}
-/*CALC-END*/
 
 const $ = (id) => document.getElementById(id);
 const nf0 = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 });
@@ -549,8 +584,8 @@ const periodLabel = () => PERIODS.filter((x) => x[0] === period)[0][1];
 
 function read() {
   return {
-    F: num('fila', 0, 100000), H: num('horarios', 0, 1000), E: num('entradas', 0, 10000), S: num('sessoes', 1, 60),
-    G: num('grupos', 0, 50), P: num('pgrupo', 1, 30), M: num('mgrupo', 1, 52),
+    F: num('fila', 0, 100000), H: num('horarios', 0, 100000), E: num('entradas', 0, 100000), S: num('sessoes', 1, 60),
+    G: num('grupos', 0, 2000), V: isNaN(parseInt($('vgrupo').value, 10)) ? 0 : num('vgrupo', 1, 20), R: num('repos', 0, 20), P: isNaN(parseInt($('pgrupo').value, 10)) ? 0 : num('pgrupo', 1, 30), M: isNaN(parseInt($('mgrupo').value, 10)) ? 0 : num('mgrupo', 1, 52),
     months: period
   };
 }
@@ -560,46 +595,60 @@ function syncBar() { $('livebar').hidden = !(ready && !verdictSeen); }
 
 function update() {
   const p = read();
-  ready = p.H > 0 && (p.F > 0 || p.E > 0);
+  const temSessoes = !isNaN(parseInt($('sessoes').value, 10)) && parseInt($('sessoes').value, 10) >= 1;
+  ready = temSessoes && p.H > 0 && (p.F > 0 || p.E > 0);
   $('vazio').hidden = ready;
   $('resultado').hidden = !ready;
   $('card-grafico').hidden = !ready;
   $('card-tabela').hidden = !ready;
-  $('det-numeros').hidden = !ready;
 
   const aviso = $('aviso-grupos');
-  if (p.G * 2 > p.H && p.H > 0) {
+  if (p.G > 0 && !(p.V && p.P && p.M)) {
     aviso.hidden = false;
-    aviso.textContent = 'Os grupos pedem ' + (p.G * 2) + ' atendimentos por semana, mas a agenda só tem ' + p.H + '. Reduza o número de grupos.';
+    aviso.textContent = 'Preencha todas as perguntas dos grupos para eles entrarem na conta.';
+  } else if (p.G * p.V > p.H && p.H > 0) {
+    aviso.hidden = false;
+    aviso.textContent = 'Os grupos pedem ' + (p.G * p.V) + ' vagas por semana, mas a agenda só tem ' + p.H + '. Reduza o número de grupos.';
   } else aviso.hidden = true;
 
   if (!ready) { verdictSeen = false; syncBar(); return; }
 
   const r = calc(p);
   const end = r.q[r.q.length - 1];
-  $('chips').innerHTML = [
-    [fmt(p.F), 'pessoas na fila hoje'],
-    [fmt(p.H), 'atendimentos da UBS por semana'],
-    [fmt(p.E), 'entram na fila por mês']
-  ].map((c, i) => '<button type="button" class="chip" data-i="' + i + '" aria-label="Alterar: ' + c[1] + ', ' + c[0] + '"><b>' + c[0] + '</b><span>' + c[1] + '</span></button>').join('');
 
   // faixa de resultado
   $('banner').className = 'verdict ' + r.state;
   $('b-glyph').innerHTML = ico(r.state, 26);
   const n = Math.round(Math.abs(r.net));
   let main, more;
+  // frase-base: sessões e, se entrarem na conta, os grupos
+  let base = 'Com mínimo de ' + p.S + (p.S === 1 ? ' sessão' : ' sessões') + ' por paciente';
+  if (r.gEff > 0) base += ' e ' + p.G + (p.G === 1 ? ' grupo semanal' : ' grupos semanais');
   if (r.state === 'up') {
-    main = 'Com ' + p.S + (p.S === 1 ? ' sessão' : ' sessões') + ' por paciente, a fila cresce cerca de ' + pessoas(n) + ' por mês.';
+    main = base + ', a fila cresce cerca de ' + pessoas(n) + ' por mês.';
     more = 'Em ' + periodLabel() + ', a fila iria de ' + fmt(p.F) + ' para cerca de ' + fmt(end) + ' pessoas.';
   } else if (r.state === 'down') {
-    main = 'Com ' + p.S + (p.S === 1 ? ' sessão' : ' sessões') + ' por paciente, a fila diminui cerca de ' + pessoas(n) + ' por mês.';
+    main = base + ', a fila diminui cerca de ' + pessoas(n) + ' por mês.';
     more = p.F > 0 ? 'Contando quem continua entrando, a fila zeraria em cerca de ' + dur(r.toZero) + '.' : 'Hoje não há ninguém na fila.';
   } else {
-    main = 'Com ' + p.S + (p.S === 1 ? ' sessão' : ' sessões') + ' por paciente, a fila fica praticamente parada.';
+    main = base + ', a fila fica praticamente parada.';
     more = p.F > 0 ? 'As ' + fmt(p.F) + ' pessoas que já esperam continuam esperando.' : 'Ninguém na fila e ninguém acumulando.';
   }
   $('b-main').textContent = main;
+  if (r.gEff > 0 && p.G * p.V > p.H) more = 'Atenção: os grupos pedem mais vagas do que a agenda tem. A conta usa só os grupos que cabem. Reduza o número de grupos.';
   $('b-more').textContent = more;
+
+  // pior caso com reposição de faltas
+  const br = $('b-repos');
+  br.hidden = !(p.R > 0);
+  if (p.R > 0) {
+    const w = calc(Object.assign({}, p, { S: p.S + p.R }));
+    const wn = Math.round(Math.abs(w.net));
+    const efeito = w.state === 'up' ? 'a fila cresceria cerca de ' + pessoas(wn) + ' por mês'
+      : w.state === 'down' ? 'a fila diminuiria cerca de ' + pessoas(wn) + ' por mês'
+      : 'a fila ficaria praticamente parada';
+    br.textContent = 'Se todos os pacientes usarem as ' + p.R + (p.R === 1 ? ' reposição' : ' reposições') + ', ' + efeito + '.';
+  }
 
   // barra do celular
   const lc = { up: 'var(--coral-d)', down: 'var(--teal)', flat: 'var(--gold-d)' }[r.state];
@@ -608,27 +657,6 @@ function update() {
   $('live-t').textContent = r.state === 'up' ? 'A fila cresce cerca de ' + pessoas(n) + ' por mês' : r.state === 'down' ? 'A fila diminui cerca de ' + pessoas(n) + ' por mês' : 'A fila fica praticamente parada';
   syncBar();
 
-  // frase-chave
-  let chave;
-  if (r.eq.kind === 'any') chave = 'Com esses grupos, a fila não cresce, qualquer número de sessões individuais serve.';
-  else if (r.eq.kind === 'none') chave = 'Os grupos ocupam todos os atendimentos da agenda. Reduza os grupos para sobrar atendimento individual.';
-  else if (r.eq.n < 1) chave = 'Mesmo com 1 sessão por paciente, a fila cresce nesta UBS.';
-  else chave = 'Para a fila parar de crescer nesta UBS, cada paciente poderia fazer no máximo ' + r.eq.n + (r.eq.n === 1 ? ' sessão.' : ' sessões.') + ' Acima disso, a fila aumenta.';
-  $('chave').textContent = chave;
-
-  // sessões máximas para zerar a fila em 1, 2 e 3 anos
-  $('zero').hidden = !(p.F > 0);
-  if (p.F > 0) {
-    $('zero-tiles').innerHTML = [[12, '1 ano'], [24, '2 anos'], [36, '3 anos']].map((x) => {
-      const z = maxSessions(p, x[0]);
-      let v, t, txt = false;
-      if (z.kind === 'any') { v = 'Qualquer'; t = 'número de sessões zera em ' + x[1]; txt = true; }
-      else if (z.kind === 'none') { v = 'Sem vaga'; t = 'individual para zerar em ' + x[1]; txt = true; }
-      else if (z.n < 1) { v = 'Não zera'; t = 'em ' + x[1] + ', nem com 1 sessão'; txt = true; }
-      else { v = String(z.n); t = (z.n === 1 ? 'sessão' : 'sessões') + ' para zerar em ' + x[1]; }
-      return '<div class="tile"><div class="v' + (txt ? ' txt' : '') + '">' + v + '</div><div class="l">' + t + '</div></div>';
-    }).join('');
-  }
 
   // números principais
   const tiles = [
@@ -641,7 +669,6 @@ function update() {
 
   drawChart(r.q, period);
   fillTable(p, r);
-  fillMonths(r.q);
 }
 
 function fillTable(p, cur) {
@@ -650,16 +677,13 @@ function fillTable(p, cur) {
   const list = Object.keys(set).map(Number).sort((a, b) => a - b);
   $('th-fim').textContent = 'Fila daqui a ' + periodLabel();
   $('tbody').innerHTML = list.map((s) => {
-    const x = calc({ F: p.F, H: p.H, E: p.E, S: s, G: p.G, P: p.P, M: p.M, months: p.months });
+    const x = calc({ F: p.F, H: p.H, E: p.E, S: s, G: p.G, V: p.V, P: p.P, M: p.M, months: p.months });
     const m = Math.round(Math.abs(x.net));
     const txt = x.state === 'up' ? 'cresce ' + m + ' por mês' : x.state === 'down' ? 'diminui ' + m + ' por mês' : 'praticamente parada';
     return '<tr class="pick' + (s === p.S ? ' current' : '') + '" tabindex="0" data-s="' + s + '"><td>' + s + (s === p.S ? '<span class="tag">escolhida</span>' : '') + '</td><td>' + fmt(x.out) + '</td><td class="' + x.state + '"><span style="display:inline-flex;align-items:center;gap:6px">' + ico(x.state, 14) + txt + '</span></td><td>' + fmt(x.q[x.q.length - 1]) + '</td></tr>';
   }).join('');
 }
 
-function fillMonths(q) {
-  $('tbody-meses').innerHTML = q.map((v, t) => '<tr><td>' + (t === 0 ? 'Hoje' : t) + '</td><td>' + fmt(v) + '</td></tr>').join('');
-}
 
 function niceScale(v) {
   if (v <= 0) return { step: 2, max: 10 };
@@ -763,125 +787,32 @@ $('tbody').addEventListener('keydown', (e) => {
 function setAll(v) {
   Object.keys(v).forEach((k) => { $(k).value = v[k]; });
 }
-const RESET = { grupos: 0, pgrupo: 8, mgrupo: 8 };
+const RESET = { grupos: 0, vgrupo: '', repos: 0, pgrupo: '', mgrupo: '' };
 function useExample() {
-  setAll(Object.assign({}, RESET, { fila: 477, horarios: 70, entradas: 30, sessoes: 20 }));
+  setAll(Object.assign({}, RESET, { fila: 477, horarios: 80, entradas: 30, sessoes: 20 }));
   update();
 }
 $('btn-exemplo').addEventListener('click', useExample);
-$('btn-limpar').addEventListener('click', (e) => {
-  setAll(Object.assign({}, RESET, { fila: 0, horarios: 0, entradas: 0, sessoes: 20 }));
+$('btn-limpar').addEventListener('click', () => {
+  setAll(Object.assign({}, RESET, { fila: 0, horarios: 0, entradas: 0, sessoes: '' }));
   update();
-  openWizard(e.currentTarget);
+  $('fila').focus();
 });
 
-// ---------- popup de perguntas ----------
-const STEPS = [
-  { id: 'fila', q: 'Quantas pessoas estão na fila de espera hoje?', min: 0, max: 100000, step: 1, solo: true,
-    hint: 'Conte na planilha da fila os nomes que ainda aguardam.' },
-  { id: 'horarios', q: 'Qual é o total de atendimentos da UBS por semana?', min: 1, max: 1000, step: 1,
-    hint: 'Some os atendimentos de uma semana de todos os profissionais da UBS.\nCada atendimento conta 1.\nNão conte as triagens.' },
-  { id: 'entradas', q: 'Quantas pessoas entram na fila de espera por mês?', min: 0, max: 10000, step: 1,
-    hint: 'Conte na planilha da fila quantos nomes foram incluídos em um mês comum, sem férias ou feriados longos, para fazer a estimativa.' }
-];
-const W = {};
-let cur = 0, opener = null, editing = false, backup = null;
-const wvalid = (s) => W[s.id] != null && W[s.id] >= s.min && W[s.id] <= s.max;
-const SHELL = ['.top', 'main', '#livebar'];
-const setInert = (on) => SHELL.forEach((q) => { const el = document.querySelector(q); if (el) el.inert = on; });
-
-function openWizard(btn, only) {
-  opener = btn || document.activeElement;
-  editing = only != null;
-  backup = editing ? { fila: $('fila').value, horarios: $('horarios').value, entradas: $('entradas').value } : null;
-  STEPS.forEach((s) => { const v = num(s.id, 0, s.max); W[s.id] = v > 0 ? v : null; });
-  cur = editing ? only : 0;
-  $('modal').hidden = false;
-  setInert(true);
-  renderStep();
-}
-function closeWizard(revert) {
-  if (revert && backup) Object.keys(backup).forEach((k) => { $(k).value = backup[k]; });
-  $('modal').hidden = true;
-  setInert(false);
-  update();
-  if (opener && opener.focus) { try { opener.focus({ preventScroll: true }); } catch (e) {} }
-}
-function goResult() {
-  if (!ready) return;
-  const calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  $('h-passo2').scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
-}
-function bigEl(s) {
-  const wrap = document.createElement('div');
-  wrap.className = 'big';
-  const minus = document.createElement('button'); minus.type = 'button'; minus.textContent = '−'; minus.setAttribute('aria-label', 'Diminuir');
-  const plus = document.createElement('button'); plus.type = 'button'; plus.textContent = '+'; plus.setAttribute('aria-label', 'Aumentar');
-  const input = document.createElement('input');
-  input.type = 'number'; input.inputMode = 'numeric'; input.min = s.min; input.max = s.max; input.placeholder = '0';
-  input.id = 'w-' + s.id; input.setAttribute('aria-label', s.q);
-  input.value = W[s.id] == null ? '' : W[s.id];
-  const set = (v) => { W[s.id] = v; input.value = v == null ? '' : v; commit(s); };
-  minus.addEventListener('click', () => set(W[s.id] == null ? s.min : Math.max(s.min, W[s.id] - s.step)));
-  plus.addEventListener('click', () => set(W[s.id] == null ? Math.max(s.min, s.step) : Math.min(s.max, W[s.id] + s.step)));
-  input.addEventListener('input', () => {
-    const v = parseInt(input.value, 10);
-    W[s.id] = isNaN(v) ? null : Math.min(s.max, Math.max(s.min, v));
-    commit(s);
+// bolinha de ajuda: toque abre e fecha a explicação
+document.querySelectorAll('.qmark').forEach((bt) => {
+  bt.addEventListener('click', () => {
+    const f = bt.closest('.field');
+    const open = !f.classList.contains('aberta');
+    f.classList.toggle('aberta', open);
+    bt.setAttribute('aria-expanded', String(open));
   });
-  input.addEventListener('blur', () => { input.value = W[s.id] == null ? '' : W[s.id]; });
-  if (!s.solo) wrap.appendChild(minus);
-  wrap.appendChild(input);
-  if (!s.solo) wrap.appendChild(plus);
-  return wrap;
-}
-function commit(s) {
-  // grava na tela de trás na hora, só quando a resposta é válida
-  if (wvalid(s)) { $(s.id).value = W[s.id]; update(); }
-  $('m-next').disabled = !wvalid(s);
-}
-function renderStep() {
-  const s = STEPS[cur];
-  $('m-count').textContent = editing ? 'Alterar resposta' : 'Pergunta ' + (cur + 1) + ' de ' + STEPS.length;
-  $('m-dots').innerHTML = editing ? '' : STEPS.map((x, i) => '<i class="' + (i <= cur ? 'on' : '') + '"></i>').join('');
-  $('m-q').textContent = s.q;
-  $('m-hint').textContent = s.hint;
-  $('m-body').innerHTML = '';
-  $('m-body').appendChild(bigEl(s));
-  $('m-back').hidden = editing || cur === 0;
-  $('m-example').hidden = editing || cur !== 0;
-  $('m-next').textContent = editing ? 'Salvar' : (cur === STEPS.length - 1 ? 'Ver resultado' : 'Continuar');
-  $('m-next').disabled = !wvalid(s);
-  setTimeout(() => { const i = $('m-body').querySelector('input'); if (i && !$('modal').hidden) { i.focus(); i.select(); } }, 30);
-}
-function nextStep() {
-  if (!wvalid(STEPS[cur])) return;
-  if (editing) { closeWizard(false); return; }
-  if (cur < STEPS.length - 1) { cur++; renderStep(); return; }
-  closeWizard(false);
-  goResult();
-}
-function backStep() { if (cur > 0) { cur--; renderStep(); } }
-function dismiss() { closeWizard(editing); }
-$('m-next').addEventListener('click', nextStep);
-$('m-back').addEventListener('click', backStep);
-$('m-example').addEventListener('click', () => { useExample(); closeWizard(false); goResult(); });
-$('m-close').addEventListener('click', dismiss);
-$('modal').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') { e.preventDefault(); nextStep(); }
-});
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('modal').hidden) dismiss(); });
-$('modal').addEventListener('click', (e) => { if (e.target === $('modal')) dismiss(); });
-$('btn-perguntas').addEventListener('click', (e) => openWizard(e.currentTarget));
-$('chips').addEventListener('click', (e) => {
-  const c = e.target.closest('.chip');
-  if (c) openWizard(c, parseInt(c.getAttribute('data-i'), 10));
 });
 
 // barra de resultado (celular): some quando o resultado já está na tela
 $('live-go').addEventListener('click', () => {
   const calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  $('h-passo2').scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
+  $('h-passo3').scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
 });
 if ('IntersectionObserver' in window) {
   new IntersectionObserver((es) => { verdictSeen = es[0].isIntersecting; syncBar(); }, { threshold: 0.25 }).observe($('banner'));
@@ -890,8 +821,80 @@ if ('IntersectionObserver' in window) {
 let rt;
 window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(update, 120); });
 buildPills();
+// ---------- tour guiado ----------
+const TOUR = [
+  { el: () => $('fila').closest('.field'), t: 'Comece aqui: preencha quantas pessoas estão na fila de espera hoje. Se tiver dúvida de como contar, toque no ?.' },
+  { el: () => $('horarios').closest('.field'), t: 'Agora, preencha quantas vagas de atendimento a agenda tem por semana, somando todos os psicólogos.' },
+  { el: () => $('entradas').closest('.field'), t: 'Preencha quantas pessoas entram na fila, em média, em um mês comum.' },
+  { el: () => $('sess'), t: 'Escolha o mínimo de sessões que cada paciente faz.' },
+  { el: () => $('mais'), t: 'Grupos e faltas, logo abaixo, são opcionais. Toque para abrir só se quiser incluir na conta.' },
+  { el: () => ($('vazio').hidden ? $('banner') : $('vazio')), t: 'O resultado aparece aqui e muda na hora, a cada número que você altera.' }
+];
+let tStep = 0;
+
+function tourPlace() {
+  if ($('tour').hidden) return;
+  const target = TOUR[tStep].el();
+  const r = target.getBoundingClientRect();
+  const pad = 8, vw = document.documentElement.clientWidth, vh = window.innerHeight;
+  const x1 = Math.max(4, r.left - pad), y1 = Math.max(4, r.top - pad);
+  const x2 = Math.min(vw - 4, r.right + pad), y2 = Math.min(vh - 4, r.bottom + pad);
+  const ring = $('tour-ring');
+  ring.style.left = x1 + 'px'; ring.style.top = y1 + 'px';
+  ring.style.width = (x2 - x1) + 'px'; ring.style.height = (y2 - y1) + 'px';
+  // quatro faixas escuras em volta da parte destacada
+  const box = (id, l, t, w, h) => { const e = $(id).style; e.left = l + 'px'; e.top = t + 'px'; e.width = Math.max(0, w) + 'px'; e.height = Math.max(0, h) + 'px'; };
+  box('tv-top', 0, 0, vw, y1);
+  box('tv-bottom', 0, y2, vw, vh - y2);
+  box('tv-left', 0, y1, x1, y2 - y1);
+  box('tv-right', x2, y1, vw - x2, y2 - y1);
+  const tip = $('tour-tip');
+  const tw = tip.offsetWidth, th = tip.offsetHeight, gap = 14;
+  let top = y2 + gap;
+  if (top + th > vh - 8) top = y1 - gap - th;
+  if (top < 8) top = Math.max(8, vh - th - 8);
+  tip.style.top = top + 'px';
+  tip.style.left = Math.max(12, Math.min(vw - tw - 12, x1)) + 'px';
+}
+function tourShow() {
+  const target = TOUR[tStep].el();
+  target.scrollIntoView({ block: 'center', behavior: 'auto' });
+  $('tour-n').textContent = (tStep + 1) + ' de ' + TOUR.length;
+  $('tour-t').textContent = TOUR[tStep].t;
+  $('tour-back').hidden = tStep === 0;
+  $('tour-next').textContent = tStep === TOUR.length - 1 ? 'Ok' : 'Próximo';
+  requestAnimationFrame(tourPlace);
+  setTimeout(() => $('tour-next').focus({ preventScroll: true }), 30);
+}
+function tourStart() {
+  tStep = 0;
+  $('tour').hidden = false;
+  $('livebar').inert = true;
+  tourShow();
+}
+function tourEnd() {
+  $('tour').hidden = true;
+  $('livebar').inert = false;
+  if (ready) $('h-passo3').scrollIntoView({ block: 'start', behavior: 'auto' });
+  else { window.scrollTo({ top: 0, behavior: 'auto' }); $('fila').focus({ preventScroll: true }); }
+}
+$('tour-next').addEventListener('click', () => { if (tStep < TOUR.length - 1) { tStep++; tourShow(); } else tourEnd(); });
+$('tour-back').addEventListener('click', () => { if (tStep > 0) { tStep--; tourShow(); } });
+$('tour-skip').addEventListener('click', tourEnd);
+$('btn-tour').addEventListener('click', tourStart);
+document.addEventListener('keydown', (e) => {
+  if ($('tour').hidden) return;
+  if (e.key === 'Escape') tourEnd();
+  else if (e.key === 'ArrowRight') $('tour-next').click();
+  else if (e.key === 'ArrowLeft') $('tour-back').click();
+});
+window.addEventListener('resize', tourPlace);
+window.addEventListener('scroll', tourPlace, { passive: true });
+// a pessoa pode mexer na parte destacada: reposiciona quando algo muda de tamanho
+['input', 'click', 'toggle'].forEach((ev) => document.addEventListener(ev, () => requestAnimationFrame(tourPlace), true));
+
 update();
-if (!ready) openWizard(null);
+setTimeout(tourStart, 400);
 </script>
 </body>
 </html>
