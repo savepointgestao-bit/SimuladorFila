@@ -81,6 +81,8 @@ h3 { font-size: 15px; margin: 0 0 6px; }
 .stepper input:focus { outline: none; }
 .stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .stepper.small button { min-width: 40px; height: 40px; }
+.stepper.solo { padding: 4px 8px; }
+.stepper.solo input { width: 130px; height: 46px; }
 .stepper.small input { font-size: 20px; width: 70px; }
 
 .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; background: var(--sage); border-radius: 14px; padding: 3px; }
@@ -198,7 +200,7 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
 .x { font: inherit; font-size: 24px; line-height: 1; width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--sage); color: var(--ink2); cursor: pointer; flex: none; }
 .x:hover { color: var(--ink); }
 .sheet h2 { font-size: 27px; line-height: 1.15; margin: 0 0 8px; }
-.m-hint { margin: 0; font-size: 14.5px; color: var(--ink2); }
+.m-hint { margin: 0; font-size: 14.5px; color: var(--ink2); white-space: pre-line; }
 .m-input { display: flex; justify-content: center; margin: 26px 0 10px; }
 .big { display: flex; align-items: center; gap: 10px; }
 .big button { font: inherit; font-size: 28px; line-height: 1; width: 56px; height: 56px; flex: none; border-radius: 50%; border: 0; background: var(--sage); color: var(--teal-d); cursor: pointer; }
@@ -276,10 +278,8 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
       <div class="field">
         <label class="q" for="fila">Quantas pessoas estão na fila de espera hoje?</label>
         <div class="row">
-          <div class="stepper" data-step="10">
-            <button type="button" data-d="-1" aria-label="Diminuir 10">−10</button>
+          <div class="stepper solo">
             <input id="fila" type="number" inputmode="numeric" min="0" max="100000" value="0">
-            <button type="button" data-d="1" aria-label="Aumentar 10">+10</button>
           </div>
           <span class="unit">pessoas</span>
         </div>
@@ -296,8 +296,7 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
           </div>
           <span class="unit">atendimentos por semana</span>
         </div>
-        <p class="hint">Conte os atendimentos da agenda em que cabe um paciente. Dois pacientes quinzenais que dividem uma vaga contam como um atendimento só. Não conte as triagens.</p>
-        <div class="note">Se houver mais de um profissional, some os atendimentos de todos.</div>
+        <p class="hint">Some os atendimentos de uma semana de todos os profissionais da UBS.<br>Cada atendimento conta 1.<br>Não conte as triagens.</p>
       </div>
 
       <div class="field">
@@ -778,10 +777,10 @@ $('btn-limpar').addEventListener('click', (e) => {
 
 // ---------- popup de perguntas ----------
 const STEPS = [
-  { id: 'fila', q: 'Quantas pessoas estão na fila de espera hoje?', min: 0, max: 100000, step: 10,
+  { id: 'fila', q: 'Quantas pessoas estão na fila de espera hoje?', min: 0, max: 100000, step: 1, solo: true,
     hint: 'Conte na planilha da fila os nomes que ainda aguardam.' },
   { id: 'horarios', q: 'Qual é o total de atendimentos da UBS por semana?', min: 1, max: 1000, step: 1,
-    hint: 'Conte os atendimentos da agenda em que cabe um paciente. Dois pacientes quinzenais que dividem uma vaga contam como um atendimento só. Não conte as triagens. Se houver mais de um profissional, some os atendimentos de todos.' },
+    hint: 'Some os atendimentos de uma semana de todos os profissionais da UBS.\nCada atendimento conta 1.\nNão conte as triagens.' },
   { id: 'entradas', q: 'Quantas pessoas entram na fila de espera por mês?', min: 0, max: 10000, step: 1,
     hint: 'Conte na planilha da fila quantos nomes foram incluídos em um mês comum, sem férias ou feriados longos, para fazer a estimativa.' }
 ];
@@ -831,7 +830,9 @@ function bigEl(s) {
     commit(s);
   });
   input.addEventListener('blur', () => { input.value = W[s.id] == null ? '' : W[s.id]; });
-  wrap.appendChild(minus); wrap.appendChild(input); wrap.appendChild(plus);
+  if (!s.solo) wrap.appendChild(minus);
+  wrap.appendChild(input);
+  if (!s.solo) wrap.appendChild(plus);
   return wrap;
 }
 function commit(s) {
