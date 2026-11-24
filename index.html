@@ -112,6 +112,8 @@ h3 { font-size: 15px; margin: 0 0 6px; }
 .verdict.down { --c: var(--teal-d); --tint: #E4EDE8; --tline: #C3D8CF; }
 .verdict.flat { --c: var(--gold-d); --tint: #F7F0DC; --tline: #E7D9AC; }
 
+.aviso { display: flex; align-items: center; gap: 10px; margin: 12px 0 0; padding: 10px 12px; border-radius: 12px; background: #F7F0DC; border: 1px solid #E7D9AC; font-size: 14.5px; }
+.aviso i { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--gold-d); color: #fff; font-style: normal; font-weight: 700; font-size: 14px; display: grid; place-items: center; }
 .key { margin: 14px 0 0; padding: 12px 14px; background: var(--sage); border-left: 4px solid var(--teal); border-radius: 12px; font-weight: 700; }
 
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 10px; margin-top: 14px; }
@@ -283,7 +285,7 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
           </div>
           <span class="unit">atendimentos por semana</span>
         </div>
-        <p class="hint">Conte os atendimentos da agenda em que cabe um paciente. Dois pacientes quinzenais que dividem uma vaga contam como um atendimento só.</p>
+        <p class="hint">Conte os atendimentos da agenda em que cabe um paciente. Dois pacientes quinzenais que dividem uma vaga contam como um atendimento só. Não conte as triagens.</p>
         <div class="note">Se houver mais de um profissional, some os atendimentos de todos.</div>
       </div>
 
@@ -340,6 +342,7 @@ td.up, .t-up { color: var(--coral-d); } td.down, .t-down { color: var(--teal-d);
               <p class="more" id="b-more"></p>
             </div>
           </div>
+          <p class="aviso" role="note"><i aria-hidden="true">!</i><span>O cálculo não considera os horários de triagem.</span></p>
           <p class="key" id="chave"></p>
           <div class="tiles" id="tiles"></div>
           <div class="dados">
@@ -737,7 +740,7 @@ const STEPS = [
   { id: 'fila', q: 'Quantas pessoas estão na fila de espera hoje?', min: 0, max: 100000, step: 10,
     hint: 'Conte na planilha da fila os nomes que ainda aguardam.' },
   { id: 'horarios', q: 'Qual é o total de atendimentos da UBS por semana?', min: 1, max: 1000, step: 1,
-    hint: 'Conte os atendimentos da agenda em que cabe um paciente. Dois pacientes quinzenais que dividem uma vaga contam como um atendimento só. Se houver mais de um profissional, some os atendimentos de todos.' },
+    hint: 'Conte os atendimentos da agenda em que cabe um paciente. Dois pacientes quinzenais que dividem uma vaga contam como um atendimento só. Não conte as triagens. Se houver mais de um profissional, some os atendimentos de todos.' },
   { id: 'entradas', q: 'Quantas pessoas entram na fila de espera por mês?', min: 0, max: 10000, step: 1,
     hint: 'Conte na planilha da fila quantos nomes foram incluídos em um mês comum, sem férias ou feriados longos, para fazer a estimativa.' }
 ];
